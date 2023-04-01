@@ -1,4 +1,4 @@
-Language: [Português](README.md) | [English](translation/en-US/README.md)
+Language: [Português](../../README.md) | [English](README.md)
 
 # Stone Payment Machine Integration Package for Flutter
 This package is a plugin for Flutter that provides integration with the payment machines of the Stone company. With this package, you can easily process payments from your Flutter app using Stone's payment machines.
