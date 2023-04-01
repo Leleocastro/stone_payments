@@ -180,4 +180,4 @@ class _MyAppState extends State<MyApp> {
 ```
 
 ### Documentação
-Você pode aprender mais sobre o SDK [aqui](http://sdkandroid.stone.com.br/).
+Você pode aprender mais sobre o SDK [aqui](https://sdkandroid.stone.com.br/).
