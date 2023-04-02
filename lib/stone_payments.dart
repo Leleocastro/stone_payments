@@ -1,15 +1,16 @@
 import 'dart:async';
+
 import 'package:flutter/widgets.dart';
+
 import 'enums/type_transaction_enum.dart';
 import 'stone_payments_platform_interface.dart';
 
 /// Classe responsável por interagir com a plataforma de pagamentos da Stone.
 class StonePayments {
-  
   /// Processa um pagamento na plataforma da Stone.
   ///
   /// Parâmetros:
-  /// 
+  ///
   /// * `value` (required) - Valor do pagamento.
   /// * `typeTransaction` (required) - Tipo de transação (crédito ou débito).
   /// * `installment` (optional) - Número de parcelas (padrão é 1).
