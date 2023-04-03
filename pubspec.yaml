@@ -1,6 +1,6 @@
 name: stone_payments
 description: Este pacote é um plugin que fornece integração com as máquinas de pagamento da empresa Stone.
-version: 0.1.2
+version: 0.1.3
 homepage: https://github.com/Leleocastro/stone_payments
 
 environment:

@@ -1,3 +1,9 @@
+## v0.1.3
+
+* More tests;
+* Print receipt of Client and Merchant;
+* Fix bugs;
+
 ## v0.1.2
 
 * Format code;
