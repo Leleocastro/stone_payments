@@ -23,17 +23,6 @@ The minSdkVersion must be equal or greater than 23
 minSdkVersion=23
 ```
 
-Add the maven from Stone, like below, in build.gradle of the project inside allProjects > repositories:
-```gradle
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-
-        maven { url "https://packagecloud.io/priv/${packageCloudReadToken}/stone/pos-android/maven2" }
-    }
-}
-
 ### Usage
 To use the Stone Payment Machine integration in your Flutter app, you need to follow these steps:
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:stone_payments/enums/status_transaction_enum.dart';
+import 'package:stone_payments/enums/type_owner_print_enum.dart';
 
 import 'enums/type_transaction_enum.dart';
 import 'stone_payments_platform_interface.dart';
@@ -74,6 +75,18 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
       'printFile',
       <String, dynamic>{
         'imgBase64': imgBase64,
+      },
+    );
+
+    return result;
+  }
+
+  @override
+  Future<String?> printReceipt(TypeOwnerPrintEnum type) async {
+    final result = await methodChannel.invokeMethod<String>(
+      'printReceipt',
+      <String, dynamic>{
+        'type': type.value,
       },
     );
 

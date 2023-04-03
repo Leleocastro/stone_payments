@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:stone_payments/enums/type_owner_print_enum.dart';
 
 import 'enums/type_transaction_enum.dart';
 import 'stone_payments_platform_interface.dart';
@@ -11,9 +12,9 @@ class StonePayments {
   ///
   /// Parâmetros:
   ///
-  /// * `value` (required) - Valor do pagamento.
+  /// * `value` (required) - Valor do pagamento. Deve ser maior que zero.
   /// * `typeTransaction` (required) - Tipo de transação (crédito ou débito).
-  /// * `installment` (optional) - Número de parcelas (padrão é 1).
+  /// * `installment` (optional) - Número de parcelas (padrão é 1). Deve ser maior que zero e menor que 13.
   /// * `printReceipt` (optional) - Opção para imprimir o comprovante (padrão é nulo).
   ///
   /// Retorna:
@@ -25,6 +26,12 @@ class StonePayments {
     int installment = 1,
     bool? printReceipt,
   }) {
+    assert(value > 0, 'O valor do pagamento deve ser maior que zero.');
+    assert(
+      installment > 0 && installment < 13,
+      'O número de parcelas deve ser maior que zero e menor que 13.',
+    );
+
     return StonePaymentsPlatform.instance.payment(
       value: value,
       typeTransaction: typeTransaction,
@@ -84,4 +91,17 @@ class StonePayments {
     VoidCallback? onDone,
     Function? onError,
   }) get onMessageListener => StonePaymentsPlatform.instance.onMessage.listen;
+
+  /// Imprime o comprovante de pagamento.
+  ///
+  /// Parâmetros:
+  ///
+  /// * `type` (required) - Tipo de via a ser impresso, do cliente ou do estabelecimento.
+  ///
+  /// Retorna:
+  ///
+  /// * Uma `Future<String?>` com o status da impressão. O valor pode ser nulo em caso de erro.
+  Future<String?> printReceipt(TypeOwnerPrintEnum type) {
+    return StonePaymentsPlatform.instance.printReceipt(type);
+  }
 }
