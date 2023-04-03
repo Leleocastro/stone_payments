@@ -16,10 +16,9 @@ import stone.database.transaction.TransactionObject
 import stone.utils.Stone
 
 class PaymentUsecase(
-    private val context: Context,
+    private val stonePayments: StonePaymentsPlugin,
 ) {
-    private val transactionObject = TransactionObject()
-
+    private val context = stonePayments.context;
 
     fun doPayment(
         value: Double,
@@ -29,6 +28,9 @@ class PaymentUsecase(
         callback: (Result<Boolean>) -> Unit,
     ) {
         try {
+            stonePayments.transactionObject = TransactionObject()
+
+            val transactionObject = stonePayments.transactionObject
 
             transactionObject.instalmentTransaction =
                 InstalmentTransactionEnum.getAt(installment - 1);

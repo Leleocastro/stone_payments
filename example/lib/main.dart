@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:stone_payments/enums/type_owner_print_enum.dart';
 import 'package:stone_payments/enums/type_transaction_enum.dart';
 import 'package:stone_payments/stone_payments.dart';
 
@@ -89,6 +90,32 @@ class _MyAppState extends State<MyApp> {
                   }
                 },
                 child: const Text('Imprimir Logo'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await stonePaymentsPlugin
+                        .printReceipt(TypeOwnerPrintEnum.merchant);
+                  } catch (e) {
+                    setState(() {
+                      text = "Falha na impressão";
+                    });
+                  }
+                },
+                child: const Text('Imprimir Via Loja'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await stonePaymentsPlugin
+                        .printReceipt(TypeOwnerPrintEnum.client);
+                  } catch (e) {
+                    setState(() {
+                      text = "Falha na impressão";
+                    });
+                  }
+                },
+                child: const Text('Imprimir Via Cliente'),
               ),
             ],
           ),
