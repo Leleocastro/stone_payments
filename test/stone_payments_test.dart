@@ -40,6 +40,11 @@ class MockStonePaymentsPlatform
   Future<String?> printReceipt(TypeOwnerPrintEnum type) {
     return Future.value('Printed Receipt');
   }
+  
+  @override
+  Future printLineToLine(List lines) {
+    return Future.value('print');
+  }
 }
 
 void main() {
@@ -124,6 +129,13 @@ void main() {
         appName: appName,
         stoneCode: stoneCode,
       );
+
+      expect(result, isA<String>());
+    });
+     test('printLineToLine should return status of printing', () async {
+      List<String> lines = [];
+
+      String? result = await stonePaymentsPlugin.printLineToLine(lines);
 
       expect(result, isA<String>());
     });

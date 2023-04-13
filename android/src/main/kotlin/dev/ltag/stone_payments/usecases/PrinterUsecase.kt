@@ -30,6 +30,28 @@ class PrinterUsecase(
 
     }
 
+    fun printLineToLine(lines: List<String>, callback: (Result<Boolean>) -> Unit) {
+        try {
+            val customPosPrintProvider = PosPrintProvider(context)
+            for (line in lines) {
+                // Adicione cada linha de texto à impressora
+                customPosPrintProvider.addLine(line)
+            }
+            customPosPrintProvider.connectionCallback = object : StoneCallbackInterface {
+                override fun onSuccess() {
+                    callback(Result.Success(true))
+                }
+    
+                override fun onError() {
+                    callback(Result.Error(Exception("Erro ao imprimir")))
+                }
+            }
+            customPosPrintProvider.execute()
+        } catch (e: Exception) {
+            callback(Result.Error(e))
+        }
+    }
+
     fun printReceipt(type: Int, callback: (Result<Boolean>) -> Unit) {
 
         val transactionObject = stonePayments.transactionObject

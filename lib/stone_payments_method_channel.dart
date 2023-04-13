@@ -82,6 +82,18 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
   }
 
   @override
+  Future printLineToLine(List<String> lines) async {
+    final result = await methodChannel.invokeMethod<String>(
+      'printLineToLine',
+      <String, dynamic>{
+        'lines': lines,
+      },
+    );
+
+    return result;
+  }
+
+  @override
   Future<String?> printReceipt(TypeOwnerPrintEnum type) async {
     final result = await methodChannel.invokeMethod<String>(
       'printReceipt',

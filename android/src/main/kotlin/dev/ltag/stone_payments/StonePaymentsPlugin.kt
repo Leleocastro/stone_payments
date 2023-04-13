@@ -74,6 +74,20 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
                     result.error("UNAVAILABLE", "Cannot Activate", e.toString())
                 }
             }
+
+            "printLineToLine" -> {
+                paymentUsecase!!.printLineToLine(
+                    call.argument("lines")!!
+                ){resp -> 
+                    when (resp) {
+                        is Result.Success<Boolean> -> result.success(
+                                "Pagamento Finalizado"
+                            )
+                            else -> result.error("Error")
+                    }
+                }
+            }
+
             "printFile" -> {
                 try {
                     printerUsecase!!.printFile(

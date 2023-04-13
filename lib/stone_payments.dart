@@ -104,4 +104,8 @@ class StonePayments {
   Future<String?> printReceipt(TypeOwnerPrintEnum type) {
     return StonePaymentsPlatform.instance.printReceipt(type);
   }
+
+  Future printLineToLine(List<String> lines) {
+    return StonePaymentsPlatform.instance.printLineToLine(lines);
+  }
 }
