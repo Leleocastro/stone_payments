@@ -1,6 +1,7 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
 import 'package:stone_payments/enums/type_transaction_enum.dart';
+import 'package:stone_payments/models/item_print_model.dart';
 
 import 'stone_payments_method_channel.dart';
 
@@ -45,6 +46,10 @@ abstract class StonePaymentsPlatform extends PlatformInterface {
 
   Future<String?> printFile(String imgBase64) {
     throw UnimplementedError('printFile() has not been implemented.');
+  }
+
+  Future<String?> print(List<ItemPrintModel> items) {
+    throw UnimplementedError('print() has not been implemented.');
   }
 
   Future<String?> printReceipt(TypeOwnerPrintEnum type) {

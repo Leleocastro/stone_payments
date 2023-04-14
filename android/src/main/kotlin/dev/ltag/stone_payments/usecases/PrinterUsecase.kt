@@ -30,6 +30,26 @@ class PrinterUsecase(
 
     }
 
+    fun print(items: List<Map<String, Any>>, callback: (Result<Boolean>) -> Unit) {
+        try {
+            val posPrintProvider = PosPrintProvider(context)
+            for (item in items) {
+                if (item["type"] == 0) {
+                    posPrintProvider.addLine(item["data"].toString())
+                } else {
+                    posPrintProvider.addBase64Image(item["data"].toString())
+                }
+            }
+
+            posPrintProvider.execute()
+            callback(Result.Success(true))
+        } catch (e: Exception) {
+            Log.d("ERROR", e.toString())
+            callback(Result.Error(e))
+        }
+
+    }
+
     fun printReceipt(type: Int, callback: (Result<Boolean>) -> Unit) {
 
         val transactionObject = stonePayments.transactionObject

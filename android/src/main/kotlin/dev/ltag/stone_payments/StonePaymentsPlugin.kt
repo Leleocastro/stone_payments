@@ -90,6 +90,22 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
                     result.error("UNAVAILABLE", "Cannot Activate", e.toString())
                 }
             }
+            "print" -> {
+                try {
+                    printerUsecase!!.print(
+                        call.argument("items")!!,
+                    ) { resp ->
+                        when (resp) {
+                            is Result.Success<Boolean> -> result.success(
+                                "Impresso"
+                            )
+                            else -> result.error("Error", resp.toString(), resp.toString())
+                        }
+                    }
+                } catch (e: Exception) {
+                    result.error("UNAVAILABLE", "Cannot Activate", e.toString())
+                }
+            }
             "printReceipt" -> {
                 try {
                     printerUsecase!!.printReceipt(

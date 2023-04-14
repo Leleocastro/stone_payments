@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:stone_payments/enums/item_print_type_enum.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
 import 'package:stone_payments/enums/type_transaction_enum.dart';
+import 'package:stone_payments/models/item_print_model.dart';
 import 'package:stone_payments/stone_payments.dart';
 import 'package:stone_payments/stone_payments_method_channel.dart';
 import 'package:stone_payments/stone_payments_platform_interface.dart';
@@ -39,6 +41,11 @@ class MockStonePaymentsPlatform
   @override
   Future<String?> printReceipt(TypeOwnerPrintEnum type) {
     return Future.value('Printed Receipt');
+  }
+
+  @override
+  Future<String?> print(List<ItemPrintModel> items) {
+    return Future.value('Printed Items');
   }
 }
 
@@ -132,6 +139,23 @@ void main() {
       String imgBase64 = 'image in base64';
 
       String? result = await stonePaymentsPlugin.printFile(imgBase64);
+
+      expect(result, isA<String>());
+    });
+
+    test('print should return status of printing', () async {
+      List<ItemPrintModel> items = [
+        const ItemPrintModel(
+          type: ItemPrintTypeEnum.text,
+          data: 'Test',
+        ),
+        const ItemPrintModel(
+          type: ItemPrintTypeEnum.image,
+          data: 'ImageTest',
+        ),
+      ];
+
+      String? result = await stonePaymentsPlugin.print(items);
 
       expect(result, isA<String>());
     });

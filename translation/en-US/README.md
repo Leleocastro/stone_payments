@@ -8,7 +8,7 @@ To use this package, add `stone_payments` as a dependency in your `pubspec.yaml`
 
 ```yaml
 dependencies:
-  stone_payments: ^0.1.0
+  stone_payments: ^0.1.4
 ```
 Then, run `flutter pub get` to install the package.
 
@@ -54,9 +54,26 @@ stonePaymentsPlugin.onMessageListener((message) {
     });
 });
 ```
-#### 5. Print image in Base64
+
+#### 5. Print texts and images
+It is necessary to pass a list with `ItemPrintModel` to the `print` method, where each item in the list is a receipt line, which can be text or image in base64.
+The image in base64 can only have a maximum of 380x595 pixels, according to Stone's documentation.
 ```dart
-await stonePaymentsPlugin.printFile(imgBase64);
+await stonePaymentsPlugin.print([
+     const ItemPrintModel(
+         type: ItemPrintTypeEnum.text,
+         data: 'Teste Título',
+     ),
+     const ItemPrintModel(
+         type: ItemPrintTypeEnum.text,
+         data: 'Teste Subtítulo',
+     ),
+     ItemPrintModel(
+         type: ItemPrintTypeEnum.image,
+         data: imgBase64,
+     ),
+  ],
+);
 ```
 
 ## Example
@@ -145,14 +162,55 @@ class _MyAppState extends State<MyApp> {
                         await rootBundle.load('assets/flutter5786.png');
                     var imgBase64 = base64Encode(byteData.buffer.asUint8List());
 
-                    await stonePaymentsPlugin.printFile(imgBase64);
+                    var items = [
+                      const ItemPrintModel(
+                        type: ItemPrintTypeEnum.text,
+                        data: 'Teste Título',
+                      ),
+                      const ItemPrintModel(
+                        type: ItemPrintTypeEnum.text,
+                        data: 'Teste Subtítulo',
+                      ),
+                      ItemPrintModel(
+                        type: ItemPrintTypeEnum.image,
+                        data: imgBase64,
+                      ),
+                    ];
+
+                    await stonePaymentsPlugin.print(items);
                   } catch (e) {
                     setState(() {
                       text = "Falha na impressão";
                     });
                   }
                 },
-                child: const Text('Imprimir Logo'),
+                child: const Text('Imprimir'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await stonePaymentsPlugin
+                        .printReceipt(TypeOwnerPrintEnum.merchant);
+                  } catch (e) {
+                    setState(() {
+                      text = "Falha na impressão";
+                    });
+                  }
+                },
+                child: const Text('Imprimir Via Loja'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await stonePaymentsPlugin
+                        .printReceipt(TypeOwnerPrintEnum.client);
+                  } catch (e) {
+                    setState(() {
+                      text = "Falha na impressão";
+                    });
+                  }
+                },
+                child: const Text('Imprimir Via Cliente'),
               ),
             ],
           ),
