@@ -3,8 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:stone_payments/enums/item_print_type_enum.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
 import 'package:stone_payments/enums/type_transaction_enum.dart';
+import 'package:stone_payments/models/item_print_model.dart';
 import 'package:stone_payments/stone_payments.dart';
 
 void main() async {
@@ -82,14 +84,29 @@ class _MyAppState extends State<MyApp> {
                         await rootBundle.load('assets/flutter5786.png');
                     var imgBase64 = base64Encode(byteData.buffer.asUint8List());
 
-                    await stonePaymentsPlugin.printFile(imgBase64);
+                    var items = [
+                      const ItemPrintModel(
+                        type: ItemPrintTypeEnum.text,
+                        data: 'Teste Título',
+                      ),
+                      const ItemPrintModel(
+                        type: ItemPrintTypeEnum.text,
+                        data: 'Teste Subtítulo',
+                      ),
+                      ItemPrintModel(
+                        type: ItemPrintTypeEnum.image,
+                        data: imgBase64,
+                      ),
+                    ];
+
+                    await stonePaymentsPlugin.print(items);
                   } catch (e) {
                     setState(() {
                       text = "Falha na impressão";
                     });
                   }
                 },
-                child: const Text('Imprimir Logo'),
+                child: const Text('Imprimir'),
               ),
               ElevatedButton(
                 onPressed: () async {

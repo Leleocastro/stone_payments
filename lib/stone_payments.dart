@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
 
 import 'enums/type_transaction_enum.dart';
+import 'models/item_print_model.dart';
 import 'stone_payments_platform_interface.dart';
 
 /// Classe responsável por interagir com a plataforma de pagamentos da Stone.
@@ -69,8 +70,22 @@ class StonePayments {
   /// Retorna:
   ///
   /// * Uma `Future<String?>` com o status da impressão. O valor pode ser nulo em caso de erro.
+  @Deprecated('Use print() instead.')
   Future<String?> printFile(String imgBase64) {
     return StonePaymentsPlatform.instance.printFile(imgBase64);
+  }
+
+  /// Imprime um arquivo a partir de uma lista de textos e imagens.
+  ///
+  /// Parâmetros:
+  ///
+  /// * `items` (required) - Lista de itens a serem impressos.
+  ///
+  /// Retorna:
+  ///
+  /// * Uma `Future<String?>` com o status da impressão. O valor pode ser nulo em caso de erro.
+  Future<String?> print(List<ItemPrintModel> items) {
+    return StonePaymentsPlatform.instance.print(items);
   }
 
   /// Retorna um [StreamSubscription] que escuta as mensagens da plataforma da Stone.

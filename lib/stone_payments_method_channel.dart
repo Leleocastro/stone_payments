@@ -6,6 +6,7 @@ import 'package:stone_payments/enums/status_transaction_enum.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
 
 import 'enums/type_transaction_enum.dart';
+import 'models/item_print_model.dart';
 import 'stone_payments_platform_interface.dart';
 
 /// An implementation of [StonePaymentsPlatform] that uses method channels.
@@ -75,6 +76,19 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
       'printFile',
       <String, dynamic>{
         'imgBase64': imgBase64,
+      },
+    );
+
+    return result;
+  }
+
+  @override
+  Future<String?> print(List<ItemPrintModel> items) async {
+    final result = await methodChannel.invokeMethod<String>(
+      'print',
+      <String, dynamic>{
+        'items':
+            items.map<Map<String, dynamic>>((item) => item.toMap()).toList(),
       },
     );
 
