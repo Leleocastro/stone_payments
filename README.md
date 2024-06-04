@@ -16,7 +16,7 @@ Em seguida, execute `flutter pub get` para instalar o pacote.
 
 Inclua no arquivo **local.properties**, localizado na raiz do projeto, a variável abaixo com seu token:
 ```
-pacoteCloudReadToken=SEU_TOKEN
+packageCloudReadToken=SEU_TOKEN
 ```
 
 O minSdkVersion deve ser igual ou maior que 23
