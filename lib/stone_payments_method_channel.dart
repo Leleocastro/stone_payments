@@ -24,8 +24,7 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
     methodChannel.setMethodCallHandler((call) async {
       switch (call.method) {
         case 'message':
-          _paymentController
-              .add(StatusTransactionEnum.fromName(call.arguments));
+          _paymentController.add(StatusTransactionEnum.fromName(call.arguments));
           break;
         default:
           _paymentController.add(call.arguments);
@@ -71,24 +70,11 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
   }
 
   @override
-  Future<String?> printFile(String imgBase64) async {
-    final result = await methodChannel.invokeMethod<String>(
-      'printFile',
-      <String, dynamic>{
-        'imgBase64': imgBase64,
-      },
-    );
-
-    return result;
-  }
-
-  @override
   Future<String?> print(List<ItemPrintModel> items) async {
     final result = await methodChannel.invokeMethod<String>(
       'print',
       <String, dynamic>{
-        'items':
-            items.map<Map<String, dynamic>>((item) => item.toMap()).toList(),
+        'items': items.map<Map<String, dynamic>>((item) => item.toMap()).toList(),
       },
     );
 

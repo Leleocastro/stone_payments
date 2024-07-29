@@ -44,10 +44,6 @@ abstract class StonePaymentsPlatform extends PlatformInterface {
     throw UnimplementedError('activateStone() has not been implemented.');
   }
 
-  Future<String?> printFile(String imgBase64) {
-    throw UnimplementedError('printFile() has not been implemented.');
-  }
-
   Future<String?> print(List<ItemPrintModel> items) {
     throw UnimplementedError('print() has not been implemented.');
   }

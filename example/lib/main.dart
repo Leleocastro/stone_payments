@@ -11,8 +11,7 @@ import 'package:stone_payments/stone_payments.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final stonePaymentsPlugin = StonePayments();
-  await stonePaymentsPlugin.activateStone(
+  await StonePayments.activateStone(
     appName: 'My App',
     stoneCode: '12345678',
   );
@@ -28,13 +27,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final stonePaymentsPlugin = StonePayments();
   String text = 'Running';
   late StreamSubscription<String> listen;
 
   @override
   void initState() {
-    listen = stonePaymentsPlugin.onMessageListener((message) {
+    listen = StonePayments.onMessageListener((message) {
       setState(() {
         text = message;
       });
@@ -63,11 +61,13 @@ class _MyAppState extends State<MyApp> {
                     listen.resume();
                   }
                   try {
-                    await stonePaymentsPlugin.payment(
+                    final result = await StonePayments.payment(
                       value: 5,
-                      typeTransaction: TypeTransactionEnum.debit,
+                      typeTransaction: TypeTransactionEnum.credit,
                     );
+                    print(result);
                   } catch (e) {
+                    print(e);
                     listen.pause();
                     setState(() {
                       text = "Falha no pagamento";
@@ -80,8 +80,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: () async {
                   try {
-                    var byteData =
-                        await rootBundle.load('assets/flutter5786.png');
+                    var byteData = await rootBundle.load('assets/flutter5786.png');
                     var imgBase64 = base64Encode(byteData.buffer.asUint8List());
 
                     var items = [
@@ -99,7 +98,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ];
 
-                    await stonePaymentsPlugin.print(items);
+                    await StonePayments.print(items);
                   } catch (e) {
                     setState(() {
                       text = "Falha na impressão";
@@ -111,8 +110,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: () async {
                   try {
-                    await stonePaymentsPlugin
-                        .printReceipt(TypeOwnerPrintEnum.merchant);
+                    await StonePayments.printReceipt(TypeOwnerPrintEnum.merchant);
                   } catch (e) {
                     setState(() {
                       text = "Falha na impressão";
@@ -124,8 +122,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: () async {
                   try {
-                    await stonePaymentsPlugin
-                        .printReceipt(TypeOwnerPrintEnum.client);
+                    await StonePayments.printReceipt(TypeOwnerPrintEnum.client);
                   } catch (e) {
                     setState(() {
                       text = "Falha na impressão";

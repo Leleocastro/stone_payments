@@ -16,20 +16,6 @@ class PrinterUsecase(
 ) {
     private val context = stonePayments.context
 
-    fun printFile(imgBase64: String, callback: (Result<Boolean>) -> Unit) {
-        try {
-            val posPrintProvider = PosPrintProvider(context)
-            posPrintProvider.addBase64Image(imgBase64)
-
-            posPrintProvider.execute()
-            callback(Result.Success(true))
-        } catch (e: Exception) {
-            Log.d("ERROR", e.toString())
-            callback(Result.Error(e))
-        }
-
-    }
-
     fun print(items: List<Map<String, Any>>, callback: (Result<Boolean>) -> Unit) {
         try {
             val posPrintProvider = PosPrintProvider(context)

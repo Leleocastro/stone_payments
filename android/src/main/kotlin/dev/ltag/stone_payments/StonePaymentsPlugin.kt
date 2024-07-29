@@ -64,24 +64,8 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
                         call.argument("printReceipt"),
                     ) { resp ->
                         when (resp) {
-                            is Result.Success<Boolean> -> result.success(
-                                "Pagamento Finalizado"
-                            )
-                            else -> result.error("Error", resp.toString(), resp.toString())
-                        }
-                    }
-                } catch (e: Exception) {
-                    result.error("UNAVAILABLE", "Cannot Activate", e.toString())
-                }
-            }
-            "printFile" -> {
-                try {
-                    printerUsecase!!.printFile(
-                        call.argument("imgBase64")!!,
-                    ) { resp ->
-                        when (resp) {
-                            is Result.Success<Boolean> -> result.success(
-                                "Impresso"
+                            is Result.Success<String> -> result.success(
+                                resp.data
                             )
                             else -> result.error("Error", resp.toString(), resp.toString())
                         }

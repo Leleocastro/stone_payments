@@ -1,6 +1,5 @@
 package dev.ltag.stone_payments.usecases
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -9,7 +8,11 @@ import br.com.stone.posandroid.providers.PosTransactionProvider
 import dev.ltag.stone_payments.Result
 import dev.ltag.stone_payments.StonePaymentsPlugin
 import io.flutter.plugin.common.MethodChannel
-import stone.application.enums.*
+import stone.application.enums.Action
+import stone.application.enums.InstalmentTransactionEnum
+import stone.application.enums.ReceiptType
+import stone.application.enums.TransactionStatusEnum
+import stone.application.enums.TypeOfTransactionEnum
 import stone.application.interfaces.StoneActionCallback
 import stone.application.interfaces.StoneCallbackInterface
 import stone.database.transaction.TransactionObject
@@ -25,7 +28,7 @@ class PaymentUsecase(
         type: Int,
         installment: Int,
         print: Boolean?,
-        callback: (Result<Boolean>) -> Unit,
+        callback: (Result<String>) -> Unit,
     ) {
         try {
             stonePayments.transactionObject = TransactionObject()
@@ -54,7 +57,7 @@ class PaymentUsecase(
                         TransactionStatusEnum.APPROVED -> {
 
 
-                            Log.d("RESULT", "SUCESSO")
+                            Log.d("SUCCESS", transactionObject.toString())
                             if (print == true) {
                                 val posPrintReceiptProvider =
                                     PosPrintReceiptProvider(
@@ -71,7 +74,6 @@ class PaymentUsecase(
                                     }
 
                                     override fun onError() {
-                                        val e = "Erro ao imprimir"
                                         Log.d("ERRORPRINT", transactionObject.toString())
 
                                     }
@@ -82,17 +84,20 @@ class PaymentUsecase(
                             }
                             sendAMessage("APPROVED")
 
-                            callback(Result.Success(true))
+//                            val serializableTransaction = convertToSerializable(transactionObject);
+//
+//                            val jsonString = Json.encodeToString(serializableTransaction)
+                            callback(Result.Success(""))
                         }
                         TransactionStatusEnum.DECLINED -> {
                             val message = provider.messageFromAuthorize
                             sendAMessage(message ?: "DECLINED")
-                            callback(Result.Success(false))
+                            callback(Result.Success(""))
                         }
                         TransactionStatusEnum.REJECTED -> {
                             val message = provider.messageFromAuthorize
                             sendAMessage(message ?: "REJECTED")
-                            callback(Result.Success(false))
+                            callback(Result.Success(""))
                         }
                         else -> {
                             val message = provider.messageFromAuthorize

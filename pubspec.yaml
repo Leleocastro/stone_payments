@@ -1,10 +1,10 @@
 name: stone_payments
 description: Este pacote é um plugin que fornece integração com as máquinas de pagamento da empresa Stone.
-version: 0.1.4
+version: 0.1.5
 homepage: https://github.com/Leleocastro/stone_payments
 
 environment:
-  sdk: '>=2.18.5 <3.0.0'
+  sdk: ">=2.18.5 <4.0.0"
   flutter: ">=2.5.0"
 
 dependencies:
@@ -23,4 +23,3 @@ flutter:
       android:
         package: dev.ltag.stone_payments
         pluginClass: StonePaymentsPlugin
-

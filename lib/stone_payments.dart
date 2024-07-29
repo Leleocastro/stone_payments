@@ -21,7 +21,7 @@ class StonePayments {
   /// Retorna:
   ///
   /// * Uma `Future<String?>` com o status do pagamento. O valor pode ser nulo em caso de erro.
-  Future<String?> payment({
+  static Future<String?> payment({
     required double value,
     required TypeTransactionEnum typeTransaction,
     int installment = 1,
@@ -32,6 +32,9 @@ class StonePayments {
       installment > 0 && installment < 13,
       'O número de parcelas deve ser maior que zero e menor que 13.',
     );
+    if (typeTransaction == TypeTransactionEnum.debit) {
+      assert(installment == 1, 'Pagamentos de débito não podem ser parcelados.');
+    }
 
     return StonePaymentsPlatform.instance.payment(
       value: value,
@@ -51,7 +54,7 @@ class StonePayments {
   /// Retorna:
   ///
   /// * Uma `Future<String?>` com o status da ativação. O valor pode ser nulo em caso de erro.
-  Future<String?> activateStone({
+  static Future<String?> activateStone({
     required String appName,
     required String stoneCode,
   }) {
@@ -59,20 +62,6 @@ class StonePayments {
       appName: appName,
       stoneCode: stoneCode,
     );
-  }
-
-  /// Imprime um arquivo a partir de uma imagem em Base64.
-  ///
-  /// Parâmetros:
-  ///
-  /// * `imgBase64` (required) - String com a imagem em Base64.
-  ///
-  /// Retorna:
-  ///
-  /// * Uma `Future<String?>` com o status da impressão. O valor pode ser nulo em caso de erro.
-  @Deprecated('Use print() instead.')
-  Future<String?> printFile(String imgBase64) {
-    return StonePaymentsPlatform.instance.printFile(imgBase64);
   }
 
   /// Imprime um arquivo a partir de uma lista de textos e imagens.
@@ -84,7 +73,7 @@ class StonePayments {
   /// Retorna:
   ///
   /// * Uma `Future<String?>` com o status da impressão. O valor pode ser nulo em caso de erro.
-  Future<String?> print(List<ItemPrintModel> items) {
+  static Future<String?> print(List<ItemPrintModel> items) {
     return StonePaymentsPlatform.instance.print(items);
   }
 
@@ -100,7 +89,7 @@ class StonePayments {
   /// Retorna:
   ///
   /// * Uma função que retorna um [StreamSubscription<String>] para escutar as mensagens da plataforma da Stone.
-  StreamSubscription<String> Function(
+  static StreamSubscription<String> Function(
     ValueChanged<String>?, {
     bool? cancelOnError,
     VoidCallback? onDone,
@@ -116,7 +105,7 @@ class StonePayments {
   /// Retorna:
   ///
   /// * Uma `Future<String?>` com o status da impressão. O valor pode ser nulo em caso de erro.
-  Future<String?> printReceipt(TypeOwnerPrintEnum type) {
+  static Future<String?> printReceipt(TypeOwnerPrintEnum type) {
     return StonePaymentsPlatform.instance.printReceipt(type);
   }
 }

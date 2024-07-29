@@ -11,12 +11,9 @@ import 'package:stone_payments/stone_payments.dart';
 import 'package:stone_payments/stone_payments_method_channel.dart';
 import 'package:stone_payments/stone_payments_platform_interface.dart';
 
-class MockStonePaymentsPlatform
-    with MockPlatformInterfaceMixin
-    implements StonePaymentsPlatform {
+class MockStonePaymentsPlatform with MockPlatformInterfaceMixin implements StonePaymentsPlatform {
   @override
-  Future<String?> activateStone(
-      {required String appName, required String stoneCode}) {
+  Future<String?> activateStone({required String appName, required String stoneCode}) {
     return Future.value('Activated');
   }
 
@@ -51,13 +48,11 @@ class MockStonePaymentsPlatform
 
 void main() {
   late StonePaymentsPlatform initialPlatform;
-  late StonePayments stonePaymentsPlugin;
   late MockStonePaymentsPlatform fakePlatform;
 
   setUp(() {
     TestWidgetsFlutterBinding.ensureInitialized();
     initialPlatform = StonePaymentsPlatform.instance;
-    stonePaymentsPlugin = StonePayments();
     fakePlatform = MockStonePaymentsPlatform();
     StonePaymentsPlatform.instance = fakePlatform;
   });
@@ -72,7 +67,7 @@ void main() {
       int installment = 1;
       bool printReceipt = false;
 
-      String? result = await stonePaymentsPlugin.payment(
+      String? result = await StonePayments.payment(
         value: value,
         typeTransaction: typeTransaction,
         installment: installment,
@@ -82,10 +77,9 @@ void main() {
       expect(result, isA<String>());
     });
 
-    test('payment throws assertion error when value is not greater than 0',
-        () async {
+    test('payment throws assertion error when value is not greater than 0', () async {
       expect(
-        () async => await StonePayments().payment(
+        () async => await StonePayments.payment(
           value: -100.0,
           typeTransaction: TypeTransactionEnum.credit,
           installment: 1,
@@ -95,11 +89,9 @@ void main() {
       );
     });
 
-    test(
-        'payment throws assertion error when installment is not greater than 0',
-        () async {
+    test('payment throws assertion error when installment is not greater than 0', () async {
       expect(
-        () async => await StonePayments().payment(
+        () async => await StonePayments.payment(
           value: 100.0,
           typeTransaction: TypeTransactionEnum.credit,
           installment: 0,
@@ -109,11 +101,9 @@ void main() {
       );
     });
 
-    test(
-        'payment throws assertion error when installment is greater than or equal to 13',
-        () async {
+    test('payment throws assertion error when installment is greater than or equal to 13', () async {
       expect(
-        () async => await StonePayments().payment(
+        () async => await StonePayments.payment(
           value: 100.0,
           typeTransaction: TypeTransactionEnum.credit,
           installment: 13,
@@ -127,18 +117,10 @@ void main() {
       String appName = 'Test App';
       String stoneCode = '12345';
 
-      String? result = await stonePaymentsPlugin.activateStone(
+      String? result = await StonePayments.activateStone(
         appName: appName,
         stoneCode: stoneCode,
       );
-
-      expect(result, isA<String>());
-    });
-
-    test('printFile should return status of printing', () async {
-      String imgBase64 = 'image in base64';
-
-      String? result = await stonePaymentsPlugin.printFile(imgBase64);
 
       expect(result, isA<String>());
     });
@@ -155,7 +137,7 @@ void main() {
         ),
       ];
 
-      String? result = await stonePaymentsPlugin.print(items);
+      String? result = await StonePayments.print(items);
 
       expect(result, isA<String>());
     });
@@ -163,7 +145,7 @@ void main() {
     test('printReceipt should return status of printing', () async {
       TypeOwnerPrintEnum type = TypeOwnerPrintEnum.client;
 
-      String? result = await stonePaymentsPlugin.printReceipt(type);
+      String? result = await StonePayments.printReceipt(type);
 
       expect(result, isA<String>());
     });
@@ -174,17 +156,17 @@ void main() {
         bool? cancelOnError,
         VoidCallback? onDone,
         Function? onError,
-      }) result = stonePaymentsPlugin.onMessageListener;
+      }) result = StonePayments.onMessageListener;
 
       expect(
           result,
           isA<
               StreamSubscription<String> Function(
-            ValueChanged<String>?, {
-            bool? cancelOnError,
-            VoidCallback? onDone,
-            Function? onError,
-          })>());
+                ValueChanged<String>?, {
+                bool? cancelOnError,
+                VoidCallback? onDone,
+                Function? onError,
+              })>());
     });
   });
 }

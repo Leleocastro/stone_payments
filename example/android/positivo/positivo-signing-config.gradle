@@ -1,0 +1,35 @@
+
+def keystorePropertiesFile = rootProject.file("positivo/positivo-keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+
+    signingConfigs {
+        positivo {
+            storeFile file("../positivo/${keystoreProperties['storeFile']}")
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            shrinkResources false
+            minifyEnabled true
+            initWith debug
+            signingConfig signingConfigs.positivo
+            matchingFallbacks = ['debug']
+        }
+        debug {
+            shrinkResources false
+            minifyEnabled false
+            initWith debug
+            signingConfig signingConfigs.positivo
+            matchingFallbacks = ['debug']
+        }
+    }
+}

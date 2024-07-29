@@ -21,7 +21,6 @@ class ActivateUsecase(
             val activeApplicationProvider = ActiveApplicationProvider(context)
             activeApplicationProvider.dialogMessage = "Ativando o Stone Code"
             activeApplicationProvider.dialogTitle = "Aguarde"
-            activeApplicationProvider.useDefaultUI(true)
             activeApplicationProvider.connectionCallback = object : StoneCallbackInterface {
 
                 override fun onSuccess() {
