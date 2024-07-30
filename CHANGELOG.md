@@ -1,3 +1,7 @@
+## v0.1.7+2
+
+- Increase documentation;
+
 ## v0.1.7
 
 - New Stone SDK version (4.9.2);

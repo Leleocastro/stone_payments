@@ -12,7 +12,9 @@ import 'package:stone_payments/stone_payments.dart';
 import 'package:stone_payments/stone_payments_method_channel.dart';
 import 'package:stone_payments/stone_payments_platform_interface.dart';
 
-class MockStonePaymentsPlatform with MockPlatformInterfaceMixin implements StonePaymentsPlatform {
+class MockStonePaymentsPlatform
+    with MockPlatformInterfaceMixin
+    implements StonePaymentsPlatform {
   @override
   Future<String?> activateStone({
     required String appName,
@@ -89,7 +91,8 @@ void main() {
       expect(result, isA<String>());
     });
 
-    test('payment throws assertion error when value is not greater than 0', () async {
+    test('payment throws assertion error when value is not greater than 0',
+        () async {
       expect(
         () async => await StonePayments.payment(
           value: -100.0,
@@ -101,7 +104,9 @@ void main() {
       );
     });
 
-    test('payment throws assertion error when installment is not greater than 0', () async {
+    test(
+        'payment throws assertion error when installment is not greater than 0',
+        () async {
       expect(
         () async => await StonePayments.payment(
           value: 100.0,
@@ -113,7 +118,9 @@ void main() {
       );
     });
 
-    test('payment throws assertion error when installment is greater than or equal to 13', () async {
+    test(
+        'payment throws assertion error when installment is greater than or equal to 13',
+        () async {
       expect(
         () async => await StonePayments.payment(
           value: 100.0,
@@ -141,7 +148,8 @@ void main() {
       expect(result, isA<Transaction>());
     });
 
-    test('transaction throws assertion error when value is not greater than 0', () async {
+    test('transaction throws assertion error when value is not greater than 0',
+        () async {
       expect(
         () async => await StonePayments.transaction(
           value: -100.0,
@@ -153,7 +161,9 @@ void main() {
       );
     });
 
-    test('transaction throws assertion error when installment is not greater than 0', () async {
+    test(
+        'transaction throws assertion error when installment is not greater than 0',
+        () async {
       expect(
         () async => await StonePayments.transaction(
           value: 100.0,
@@ -165,7 +175,9 @@ void main() {
       );
     });
 
-    test('transaction throws assertion error when installment is greater than or equal to 13', () async {
+    test(
+        'transaction throws assertion error when installment is greater than or equal to 13',
+        () async {
       expect(
         () async => await StonePayments.transaction(
           value: 100.0,
@@ -177,7 +189,9 @@ void main() {
       );
     });
 
-    test('transaction should throw assertion error for debit transaction with installment greater than 1', () {
+    test(
+        'transaction should throw assertion error for debit transaction with installment greater than 1',
+        () {
       expect(
         () => StonePayments.transaction(
           value: 100.00,

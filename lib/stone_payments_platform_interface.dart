@@ -7,6 +7,7 @@ import 'package:stone_payments/models/transaction.dart';
 
 import 'stone_payments_method_channel.dart';
 
+/// The interface that implementations of stone_payments must implement.
 abstract class StonePaymentsPlatform extends PlatformInterface {
   /// Constructs a StonePaymentsPlatform.
   StonePaymentsPlatform() : super(token: _token);
@@ -28,8 +29,10 @@ abstract class StonePaymentsPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  /// Stream of messages
   Stream<String> get onMessage;
 
+  /// Payment
   Future<String?> payment({
     required double value,
     required TypeTransactionEnum typeTransaction,
@@ -39,6 +42,7 @@ abstract class StonePaymentsPlatform extends PlatformInterface {
     throw UnimplementedError('payment() has not been implemented.');
   }
 
+  /// Transaction
   Future<Transaction?> transaction({
     required double value,
     required TypeTransactionEnum typeTransaction,
@@ -49,6 +53,7 @@ abstract class StonePaymentsPlatform extends PlatformInterface {
     throw UnimplementedError('payment() has not been implemented.');
   }
 
+  /// Activate Stone
   Future<String?> activateStone({
     required String appName,
     required String stoneCode,
@@ -58,10 +63,12 @@ abstract class StonePaymentsPlatform extends PlatformInterface {
     throw UnimplementedError('activateStone() has not been implemented.');
   }
 
+  /// Print
   Future<String?> print(List<ItemPrintModel> items) {
     throw UnimplementedError('print() has not been implemented.');
   }
 
+  /// Print Receipt
   Future<String?> printReceipt(TypeOwnerPrintEnum type) {
     throw UnimplementedError('printReceipt() has not been implemented.');
   }

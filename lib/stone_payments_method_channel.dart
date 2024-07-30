@@ -25,11 +25,13 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
   @override
   Stream<String> get onMessage => _paymentController.stream;
 
+  /// Constructor and method channel initialization
   MethodChannelStonePayments() {
     methodChannel.setMethodCallHandler((call) async {
       switch (call.method) {
         case 'message':
-          _paymentController.add(StatusTransactionEnum.fromName(call.arguments));
+          _paymentController
+              .add(StatusTransactionEnum.fromName(call.arguments));
           break;
         case 'pixQrCode':
           _currentOnPixQrCode?.call(call.arguments);
@@ -126,7 +128,8 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
     final result = await methodChannel.invokeMethod<String>(
       'print',
       <String, dynamic>{
-        'items': items.map<Map<String, dynamic>>((item) => item.toMap()).toList(),
+        'items':
+            items.map<Map<String, dynamic>>((item) => item.toMap()).toList(),
       },
     );
 
