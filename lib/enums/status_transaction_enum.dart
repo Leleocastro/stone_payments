@@ -60,29 +60,66 @@
 ///
 /// In the case of a transaction with the status [PENDING_REVERSAL],
 enum StatusTransactionEnum {
+  /// Ocorreu um erro antes de ser enviada para o autorizador.
   UNKNOWN("Ocorreu um erro antes de ser enviada para o autorizador."),
+
+  /// Transação aprovada com sucesso.
   APPROVED("Transação aprovada com sucesso."),
+
+  /// Transação negada.
   DECLINED("Transação negada."),
+
+  /// Transação negada pelo cartão.
   DECLINED_BY_CARD("Transação negada pelo cartão."),
+
+  /// Transação cancelada.
   CANCELLED("Transação cancelada."),
+
+  /// Transação foi parcialmente aprovada.
   PARTIAL_APPROVED("Transação foi parcialmente aprovada."),
+
+  /// Erro técnico.
   TECHNICAL_ERROR("Erro técnico."),
+
+  /// Transação rejeitada.
   REJECTED("Transação rejeitada."),
+
+  /// Transação não completada com sucesso
   WITH_ERROR("Transação não completada com sucesso."),
+
+  /// A transação está em andamento.
   PENDING("A transação está em andamento."),
+
+  /// A transação foi cancelada automaticamente.
   REVERSED("A transação foi cancelada automaticamente."),
+
+  /// Transação foi interrompida.
   PENDING_REVERSAL("Transação foi interrompida."),
+
+  /// Aproxime, insira ou passe o cartão.
   TRANSACTION_WAITING_CARD("Aproxime, insira ou passe o cartão."),
+
+  /// Aguardando a senha do cartão.
   TRANSACTION_WAITING_PASSWORD("Aguardando a senha do cartão."),
+
+  /// Enviando a transação.
   TRANSACTION_SENDING("Enviando a transação."),
+
+  /// Remova o cartão.
   TRANSACTION_REMOVE_CARD("Remova o cartão."),
+
+  /// Cartão removido.
   TRANSACTION_CARD_REMOVED("Cartão removido."),
+
+  /// Tentando reverter transação.
   REVERSING_TRANSACTION_WITH_ERROR("Tentando reverter transação.");
 
+  /// Values of the enum
   final String value;
 
   const StatusTransactionEnum(this.value);
 
+  /// Return the name of the enum
   static String fromName(String name) {
     var listValues = StatusTransactionEnum.values.where((e) => e.name == name);
 

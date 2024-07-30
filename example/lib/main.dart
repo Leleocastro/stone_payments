@@ -93,8 +93,10 @@ class _MyAppState extends State<MyApp> {
                 ElevatedButton(
                   onPressed: () async {
                     try {
-                      var byteData = await rootBundle.load('assets/flutter5786.png');
-                      var imgBase64 = base64Encode(byteData.buffer.asUint8List());
+                      var byteData =
+                          await rootBundle.load('assets/flutter5786.png');
+                      var imgBase64 =
+                          base64Encode(byteData.buffer.asUint8List());
 
                       var items = [
                         const ItemPrintModel(
@@ -123,7 +125,8 @@ class _MyAppState extends State<MyApp> {
                 ElevatedButton(
                   onPressed: () async {
                     try {
-                      await StonePayments.printReceipt(TypeOwnerPrintEnum.merchant);
+                      await StonePayments.printReceipt(
+                          TypeOwnerPrintEnum.merchant);
                     } catch (e) {
                       setState(() {
                         text = "Falha na impressão";
@@ -135,7 +138,8 @@ class _MyAppState extends State<MyApp> {
                 ElevatedButton(
                   onPressed: () async {
                     try {
-                      await StonePayments.printReceipt(TypeOwnerPrintEnum.client);
+                      await StonePayments.printReceipt(
+                          TypeOwnerPrintEnum.client);
                     } catch (e) {
                       setState(() {
                         text = "Falha na impressão";

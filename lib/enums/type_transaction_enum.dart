@@ -7,11 +7,19 @@
 /// 2 = Voucher
 /// 4 = PIX
 enum TypeTransactionEnum {
+  /// Debit
   debit(0),
+
+  /// Credit
   credit(1),
+
+  /// Voucher
   voucher(2),
+
+  /// PIX
   pix(4);
 
+  /// Values of the enum
   final int value;
 
   const TypeTransactionEnum(this.value);
