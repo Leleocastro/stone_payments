@@ -42,7 +42,9 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
                 try {
                     activateUsecase!!.doActivate(
                         call.argument("appName")!!,
-                        call.argument("stoneCode")!!
+                        call.argument("stoneCode")!!,
+                        call.argument("qrCodeProviderId"),
+                        call.argument("qrCodeAuthorization")
                     ) { resp ->
                         when (resp) {
                             is Result.Success<Boolean> -> result.success(
@@ -58,6 +60,25 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
             "payment" -> {
                 try {
                     paymentUsecase!!.doPayment(
+                        call.argument("value")!!,
+                        call.argument("typeTransaction")!!,
+                        call.argument("installment")!!,
+                        call.argument("printReceipt"),
+                    ) { resp ->
+                        when (resp) {
+                            is Result.Success<Boolean> -> result.success(
+                                resp.data
+                            )
+                            else -> result.error("Error", resp.toString(), resp.toString())
+                        }
+                    }
+                } catch (e: Exception) {
+                    result.error("UNAVAILABLE", "Cannot Activate", e.toString())
+                }
+            }
+            "transaction" -> {
+                try {
+                    paymentUsecase!!.doTransaction(
                         call.argument("value")!!,
                         call.argument("typeTransaction")!!,
                         call.argument("installment")!!,

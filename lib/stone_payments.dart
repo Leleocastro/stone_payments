@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
+import 'package:stone_payments/models/transaction.dart';
 
 import 'enums/type_transaction_enum.dart';
 import 'models/item_print_model.dart';
@@ -21,6 +22,7 @@ class StonePayments {
   /// Retorna:
   ///
   /// * Uma `Future<String?>` com o status do pagamento. O valor pode ser nulo em caso de erro.
+  @Deprecated('Use transaction() instead.')
   static Future<String?> payment({
     required double value,
     required TypeTransactionEnum typeTransaction,
@@ -33,7 +35,7 @@ class StonePayments {
       'O número de parcelas deve ser maior que zero e menor que 13.',
     );
     if (typeTransaction == TypeTransactionEnum.debit) {
-      assert(installment == 1, 'Pagamentos de débito não podem ser parcelados.');
+      assert(installment == 1, 'Pagamentos débito não pode ser parcelados.');
     }
 
     return StonePaymentsPlatform.instance.payment(
@@ -44,12 +46,52 @@ class StonePayments {
     );
   }
 
+  /// Processa uma transação na plataforma da Stone.
+  ///
+  /// Parâmetros:
+  ///
+  /// * `value` (required) - Valor do pagamento. Deve ser maior que zero.
+  /// * `typeTransaction` (required) - Tipo de transação (crédito ou débito).
+  /// * `installment` (optional) - Número de parcelas (padrão é 1). Deve ser maior que zero e menor que 13.
+  /// * `printReceipt` (optional) - Opção para imprimir o comprovante (padrão é nulo).
+  /// * `onPixQrCode` (optional) - Função de retorno para tratar o QR Code do PIX.
+  ///
+  /// Retorna:
+  ///
+  /// * Uma `Future<Transaction?>` com o objeto da transação. O valor pode ser nulo em caso de erro.
+  static Future<Transaction?> transaction({
+    required double value,
+    required TypeTransactionEnum typeTransaction,
+    int installment = 1,
+    bool? printReceipt,
+    ValueChanged<String>? onPixQrCode,
+  }) {
+    assert(value > 0, 'O valor do pagamento deve ser maior que zero.');
+    assert(
+      installment > 0 && installment < 13,
+      'O número de parcelas deve ser maior que zero e menor que 13.',
+    );
+    if (typeTransaction == TypeTransactionEnum.debit) {
+      assert(installment == 1, 'Pagamentos débito não pode ser parcelados.');
+    }
+
+    return StonePaymentsPlatform.instance.transaction(
+      value: value,
+      typeTransaction: typeTransaction,
+      installment: installment,
+      printReceipt: printReceipt,
+      onPixQrCode: onPixQrCode,
+    );
+  }
+
   /// Ativação do SDK da Stone Payments.
   ///
   /// Parâmetros:
   ///
   /// * `appName` (required) - Nome do aplicativo.
   /// * `stoneCode` (required) - Código da Stone.
+  /// * `qrCodeProviderId` (optional) - ID do provedor do QR Code.
+  /// * `qrCodeAuthorization` (optional) - Autorização do QR Code.
   ///
   /// Retorna:
   ///
@@ -57,10 +99,14 @@ class StonePayments {
   static Future<String?> activateStone({
     required String appName,
     required String stoneCode,
+    String? qrCodeProviderId,
+    String? qrCodeAuthorization,
   }) {
     return StonePaymentsPlatform.instance.activateStone(
       appName: appName,
       stoneCode: stoneCode,
+      qrCodeProviderId: qrCodeProviderId,
+      qrCodeAuthorization: qrCodeAuthorization,
     );
   }
 

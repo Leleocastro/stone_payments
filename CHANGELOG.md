@@ -1,8 +1,12 @@
-## v0.1.5
+## v0.1.7
 
 - New Stone SDK version (4.9.2);
-- Added support to all stone devices;
--
+- Added support to positivo and gertec devices;
+- New method `transaction`;
+- Deprecated `payment` method;
+- Payment method pix added;
+- Payment method voucher added;
+- README updated;
 
 ## v0.1.4
 

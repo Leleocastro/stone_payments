@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
 import 'package:stone_payments/enums/type_transaction_enum.dart';
 import 'package:stone_payments/models/item_print_model.dart';
+import 'package:stone_payments/models/transaction.dart';
 
 import 'stone_payments_method_channel.dart';
 
@@ -37,9 +39,21 @@ abstract class StonePaymentsPlatform extends PlatformInterface {
     throw UnimplementedError('payment() has not been implemented.');
   }
 
+  Future<Transaction?> transaction({
+    required double value,
+    required TypeTransactionEnum typeTransaction,
+    int installment = 1,
+    bool? printReceipt,
+    ValueChanged<String>? onPixQrCode,
+  }) {
+    throw UnimplementedError('payment() has not been implemented.');
+  }
+
   Future<String?> activateStone({
     required String appName,
     required String stoneCode,
+    String? qrCodeProviderId,
+    String? qrCodeAuthorization,
   }) {
     throw UnimplementedError('activateStone() has not been implemented.');
   }

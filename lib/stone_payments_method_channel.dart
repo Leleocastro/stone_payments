@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:stone_payments/enums/status_transaction_enum.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
+import 'package:stone_payments/models/transaction.dart';
 
 import 'enums/type_transaction_enum.dart';
 import 'models/item_print_model.dart';
@@ -17,6 +18,10 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
 
   final _paymentController = StreamController<String>.broadcast();
 
+  bool _paymentInProgress = false;
+
+  ValueChanged<String>? _currentOnPixQrCode;
+
   @override
   Stream<String> get onMessage => _paymentController.stream;
 
@@ -25,6 +30,9 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
       switch (call.method) {
         case 'message':
           _paymentController.add(StatusTransactionEnum.fromName(call.arguments));
+          break;
+        case 'pixQrCode':
+          _currentOnPixQrCode?.call(call.arguments);
           break;
         default:
           _paymentController.add(call.arguments);
@@ -54,15 +62,59 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
   }
 
   @override
+  Future<Transaction?> transaction({
+    required double value,
+    required TypeTransactionEnum typeTransaction,
+    int installment = 1,
+    bool? printReceipt,
+    ValueChanged<String>? onPixQrCode,
+  }) async {
+    try {
+      if (_paymentInProgress) {
+        return null;
+      }
+
+      _paymentInProgress = true;
+
+      _currentOnPixQrCode = onPixQrCode;
+
+      final result = await methodChannel.invokeMethod<String>(
+        'transaction',
+        <String, dynamic>{
+          'value': value,
+          'typeTransaction': typeTransaction.value,
+          'installment': installment,
+          'printReceipt': printReceipt,
+        },
+      );
+
+      if (result == null) {
+        return null;
+      }
+
+      _paymentInProgress = false;
+
+      return Transaction.fromJson(result);
+    } catch (e) {
+      _paymentInProgress = false;
+      rethrow;
+    }
+  }
+
+  @override
   Future<String?> activateStone({
     required String appName,
     required String stoneCode,
+    String? qrCodeProviderId,
+    String? qrCodeAuthorization,
   }) async {
     final result = await methodChannel.invokeMethod<String>(
       'activateStone',
       <String, dynamic>{
         'appName': appName,
         'stoneCode': stoneCode,
+        'qrCodeProviderId': qrCodeProviderId,
+        'qrCodeAuthorization': qrCodeAuthorization,
       },
     );
 

@@ -7,23 +7,24 @@ import 'package:stone_payments/enums/item_print_type_enum.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
 import 'package:stone_payments/enums/type_transaction_enum.dart';
 import 'package:stone_payments/models/item_print_model.dart';
+import 'package:stone_payments/models/transaction.dart';
 import 'package:stone_payments/stone_payments.dart';
 import 'package:stone_payments/stone_payments_method_channel.dart';
 import 'package:stone_payments/stone_payments_platform_interface.dart';
 
 class MockStonePaymentsPlatform with MockPlatformInterfaceMixin implements StonePaymentsPlatform {
   @override
-  Future<String?> activateStone({required String appName, required String stoneCode}) {
+  Future<String?> activateStone({
+    required String appName,
+    required String stoneCode,
+    String? qrCodeProviderId,
+    String? qrCodeAuthorization,
+  }) {
     return Future.value('Activated');
   }
 
   @override
   Stream<String> get onMessage => Stream.value('Message');
-
-  @override
-  Future<String?> printFile(String imgBase64) {
-    return Future.value('Printed Image');
-  }
 
   @override
   Future<String?> payment({
@@ -33,6 +34,17 @@ class MockStonePaymentsPlatform with MockPlatformInterfaceMixin implements Stone
     bool? printReceipt,
   }) {
     return Future.value('Paied');
+  }
+
+  @override
+  Future<Transaction?> transaction({
+    required double value,
+    required TypeTransactionEnum typeTransaction,
+    int installment = 1,
+    bool? printReceipt,
+    ValueChanged<String>? onPixQrCode,
+  }) {
+    return Future.value(Transaction());
   }
 
   @override
@@ -110,6 +122,73 @@ void main() {
           printReceipt: true,
         ),
         throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('transaction should return the transaction object', () async {
+      double value = 100.00;
+      TypeTransactionEnum typeTransaction = TypeTransactionEnum.credit;
+      int installment = 1;
+      bool printReceipt = false;
+
+      var result = await StonePayments.transaction(
+        value: value,
+        typeTransaction: typeTransaction,
+        installment: installment,
+        printReceipt: printReceipt,
+      );
+
+      expect(result, isA<Transaction>());
+    });
+
+    test('transaction throws assertion error when value is not greater than 0', () async {
+      expect(
+        () async => await StonePayments.transaction(
+          value: -100.0,
+          typeTransaction: TypeTransactionEnum.credit,
+          installment: 1,
+          printReceipt: true,
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('transaction throws assertion error when installment is not greater than 0', () async {
+      expect(
+        () async => await StonePayments.transaction(
+          value: 100.0,
+          typeTransaction: TypeTransactionEnum.credit,
+          installment: 0,
+          printReceipt: true,
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('transaction throws assertion error when installment is greater than or equal to 13', () async {
+      expect(
+        () async => await StonePayments.transaction(
+          value: 100.0,
+          typeTransaction: TypeTransactionEnum.credit,
+          installment: 13,
+          printReceipt: true,
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('transaction should throw assertion error for debit transaction with installment greater than 1', () {
+      expect(
+        () => StonePayments.transaction(
+          value: 100.00,
+          typeTransaction: TypeTransactionEnum.debit,
+          installment: 2,
+        ),
+        throwsA(isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          'Pagamentos débito não pode ser parcelados.',
+        )),
       );
     });
 

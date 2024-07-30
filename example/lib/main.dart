@@ -14,6 +14,8 @@ void main() async {
   await StonePayments.activateStone(
     appName: 'My App',
     stoneCode: '12345678',
+    qrCodeAuthorization: 'TOKEN',
+    qrCodeProviderId: 'PROVIDER_ID',
   );
 
   runApp(const MyApp());
@@ -29,6 +31,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String text = 'Running';
   late StreamSubscription<String> listen;
+  Uint8List? image;
 
   @override
   void initState() {
@@ -50,88 +53,99 @@ class _MyAppState extends State<MyApp> {
         ),
         body: SizedBox(
           width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(text),
-              ElevatedButton(
-                onPressed: () async {
-                  if (listen.isPaused) {
-                    listen.resume();
-                  }
-                  try {
-                    final result = await StonePayments.payment(
-                      value: 5,
-                      typeTransaction: TypeTransactionEnum.credit,
-                    );
-                    print(result);
-                  } catch (e) {
-                    print(e);
-                    listen.pause();
-                    setState(() {
-                      text = "Falha no pagamento";
-                    });
-                  }
-                },
-                child: const Text('Comprar R\$5,00'),
-              ),
-              Image.asset('assets/flutter5786.png'),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    var byteData = await rootBundle.load('assets/flutter5786.png');
-                    var imgBase64 = base64Encode(byteData.buffer.asUint8List());
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(text),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (listen.isPaused) {
+                      listen.resume();
+                    }
+                    try {
+                      final result = await StonePayments.transaction(
+                        value: 5,
+                        typeTransaction: TypeTransactionEnum.pix,
+                        onPixQrCode: (value) {
+                          setState(() {
+                            image = base64Decode(value);
+                          });
+                        },
+                      );
+                      print(result);
+                    } catch (e) {
+                      listen.pause();
+                      setState(() {
+                        text = "Falha no pagamento";
+                      });
+                    }
+                  },
+                  child: const Text('Comprar'),
+                ),
+                if (image != null)
+                  Image.memory(
+                    image!,
+                    height: 200,
+                  ),
+                Image.asset('assets/flutter5786.png'),
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      var byteData = await rootBundle.load('assets/flutter5786.png');
+                      var imgBase64 = base64Encode(byteData.buffer.asUint8List());
 
-                    var items = [
-                      const ItemPrintModel(
-                        type: ItemPrintTypeEnum.text,
-                        data: 'Teste Título',
-                      ),
-                      const ItemPrintModel(
-                        type: ItemPrintTypeEnum.text,
-                        data: 'Teste Subtítulo',
-                      ),
-                      ItemPrintModel(
-                        type: ItemPrintTypeEnum.image,
-                        data: imgBase64,
-                      ),
-                    ];
+                      var items = [
+                        const ItemPrintModel(
+                          type: ItemPrintTypeEnum.text,
+                          data: 'Teste Título',
+                        ),
+                        const ItemPrintModel(
+                          type: ItemPrintTypeEnum.text,
+                          data: 'Teste Subtítulo',
+                        ),
+                        ItemPrintModel(
+                          type: ItemPrintTypeEnum.image,
+                          data: imgBase64,
+                        ),
+                      ];
 
-                    await StonePayments.print(items);
-                  } catch (e) {
-                    setState(() {
-                      text = "Falha na impressão";
-                    });
-                  }
-                },
-                child: const Text('Imprimir'),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await StonePayments.printReceipt(TypeOwnerPrintEnum.merchant);
-                  } catch (e) {
-                    setState(() {
-                      text = "Falha na impressão";
-                    });
-                  }
-                },
-                child: const Text('Imprimir Via Loja'),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await StonePayments.printReceipt(TypeOwnerPrintEnum.client);
-                  } catch (e) {
-                    setState(() {
-                      text = "Falha na impressão";
-                    });
-                  }
-                },
-                child: const Text('Imprimir Via Cliente'),
-              ),
-            ],
+                      await StonePayments.print(items);
+                    } catch (e) {
+                      setState(() {
+                        text = "Falha na impressão";
+                      });
+                    }
+                  },
+                  child: const Text('Imprimir'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      await StonePayments.printReceipt(TypeOwnerPrintEnum.merchant);
+                    } catch (e) {
+                      setState(() {
+                        text = "Falha na impressão";
+                      });
+                    }
+                  },
+                  child: const Text('Imprimir Via Loja'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      await StonePayments.printReceipt(TypeOwnerPrintEnum.client);
+                    } catch (e) {
+                      setState(() {
+                        text = "Falha na impressão";
+                      });
+                    }
+                  },
+                  child: const Text('Imprimir Via Cliente'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
