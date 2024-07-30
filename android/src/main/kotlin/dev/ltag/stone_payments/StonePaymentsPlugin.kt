@@ -42,7 +42,9 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
                 try {
                     activateUsecase!!.doActivate(
                         call.argument("appName")!!,
-                        call.argument("stoneCode")!!
+                        call.argument("stoneCode")!!,
+                        call.argument("qrCodeProviderId"),
+                        call.argument("qrCodeAuthorization")
                     ) { resp ->
                         when (resp) {
                             is Result.Success<Boolean> -> result.success(
@@ -65,7 +67,7 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
                     ) { resp ->
                         when (resp) {
                             is Result.Success<Boolean> -> result.success(
-                                "Pagamento Finalizado"
+                                resp.data
                             )
                             else -> result.error("Error", resp.toString(), resp.toString())
                         }
@@ -74,14 +76,17 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
                     result.error("UNAVAILABLE", "Cannot Activate", e.toString())
                 }
             }
-            "printFile" -> {
+            "transaction" -> {
                 try {
-                    printerUsecase!!.printFile(
-                        call.argument("imgBase64")!!,
+                    paymentUsecase!!.doTransaction(
+                        call.argument("value")!!,
+                        call.argument("typeTransaction")!!,
+                        call.argument("installment")!!,
+                        call.argument("printReceipt"),
                     ) { resp ->
                         when (resp) {
-                            is Result.Success<Boolean> -> result.success(
-                                "Impresso"
+                            is Result.Success<String> -> result.success(
+                                resp.data
                             )
                             else -> result.error("Error", resp.toString(), resp.toString())
                         }

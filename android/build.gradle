@@ -3,8 +3,8 @@ version '1.0-SNAPSHOT'
 
 buildscript {
     ext {
-        kotlin_version = '1.6.10'        
-        stone_sdk_version = '4.3.11'
+        kotlin_version = '1.9.0'
+        stone_sdk_version = '4.9.2'
 
         localProp = new Properties()
         fileName = 'local.properties'
@@ -39,6 +39,10 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 33
 
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -58,9 +62,11 @@ android {
 }
 
 dependencies {
+    implementation "com.google.code.gson:gson:2.10.1"
     implementation "br.com.stone:stone-sdk:$stone_sdk_version"
     implementation "br.com.stone:stone-sdk-posandroid:$stone_sdk_version"
     implementation "br.com.stone:stone-sdk-posandroid-sunmi:$stone_sdk_version"
     implementation "br.com.stone:stone-sdk-posandroid-ingenico:$stone_sdk_version"
     implementation "br.com.stone:stone-sdk-posandroid-gertec:$stone_sdk_version"
+    implementation "br.com.stone:stone-sdk-posandroid-positivo:$stone_sdk_version"
 }
