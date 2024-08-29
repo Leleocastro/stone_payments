@@ -147,4 +147,11 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
 
     return result;
   }
+
+  @override
+  Future<String?> abort() async {
+    final result = await methodChannel.invokeMethod<String>('abort');
+
+    return result;
+  }
 }

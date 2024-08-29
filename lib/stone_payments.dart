@@ -154,4 +154,10 @@ class StonePayments {
   static Future<String?> printReceipt(TypeOwnerPrintEnum type) {
     return StonePaymentsPlatform.instance.printReceipt(type);
   }
+
+  /// Aborta a transação atual.
+  ///
+  static Future<String?> abort() {
+    return StonePaymentsPlatform.instance.abort();
+  }
 }

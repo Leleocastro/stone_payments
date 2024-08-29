@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.gson.Gson
 import br.com.stone.posandroid.providers.PosPrintReceiptProvider
 import br.com.stone.posandroid.providers.PosTransactionProvider
+
 import dev.ltag.stone_payments.Result
 import dev.ltag.stone_payments.StonePaymentsPlugin
 import dev.ltag.stone_payments.core.Helper
@@ -26,6 +27,7 @@ class PaymentUsecase(
     private val stonePayments: StonePaymentsPlugin,
 ) {
     private val context = stonePayments.context
+    lateinit var provider: PosTransactionProvider
 
     fun doPayment(
         value: Double,
@@ -47,7 +49,7 @@ class PaymentUsecase(
             val newValue: Int = (value * 100).toInt()
             transactionObject.amount = newValue.toString()
 
-            val provider = PosTransactionProvider(
+            provider = PosTransactionProvider(
                 context,
                 transactionObject,
                 Stone.getUserModel(0),
@@ -152,7 +154,7 @@ class PaymentUsecase(
             val newValue: Int = (value * 100).toInt()
             transactionObject.amount = newValue.toString()
 
-            val provider = PosTransactionProvider(
+            provider = PosTransactionProvider(
                 context,
                 transactionObject,
                 Stone.getUserModel(0),
@@ -229,6 +231,23 @@ class PaymentUsecase(
             provider.execute()
 
 
+        } catch (e: Exception) {
+            Log.d("ERROR", e.toString())
+            callback(Result.Error(e))
+        }
+
+    }
+
+    fun doAbort(callback: (Result<String>) -> Unit,
+    ) {
+        try {
+            val transactionObject = stonePayments.transactionObject
+
+            if(provider == null){
+                return
+            }
+
+            provider.abortPayment()
         } catch (e: Exception) {
             Log.d("ERROR", e.toString())
             callback(Result.Error(e))

@@ -13,9 +13,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StonePayments.activateStone(
     appName: 'My App',
-    stoneCode: '12345678',
-    qrCodeAuthorization: 'TOKEN',
-    qrCodeProviderId: 'PROVIDER_ID',
+    stoneCode: '206192723',
+    qrCodeAuthorization: '202653a0-018c-41d7-8123-13c6dd5bddb9',
+    qrCodeProviderId: '26b26ae1-e879-4d82-8f7c-53658aed948f',
   );
 
   runApp(const MyApp());
@@ -204,6 +204,28 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ],
                 ),
+                //ABORTAR TRANSAÇÃO
+                ElevatedButton(
+                  onPressed: () async {
+                    FocusScope.of(context).unfocus();
+                    if (valueController.text.isEmpty) return;
+
+                    if (listen.isPaused) {
+                      listen.resume();
+                    }
+
+                    try {
+                      final result = await StonePayments.abort();
+                      if (result == null) return;
+                      debugPrint(result.toString());
+                    } catch (e) {
+                      // listen.pause();
+                      // message.value = "Falha ao abortar transação";
+                    }
+                  },
+                  child: const Text('Abortar Transação'),
+                ),
+
                 if (image != null)
                   Image.memory(
                     image!,
@@ -248,24 +270,24 @@ class _MyAppState extends State<MyApp> {
                   },
                   child: const Text('Teste de Impressão'),
                 ),
-                   ValueListenableBuilder(
-                      valueListenable: transactionSuccefull,
-                      builder: (context, transactionSuccefull, child) {
-                        if (transactionSuccefull) {
-                          return ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                await StonePayments.printReceipt(
-                                    TypeOwnerPrintEnum.client);
-                              } catch (e) {
-                                message.value = "Falha no pagamento";
-                              }
-                            },
-                            child: const Text('Imprimir Via Cliente'),
-                          );
-                        }
-                        return const SizedBox();
-                      }),
+                ValueListenableBuilder(
+                    valueListenable: transactionSuccefull,
+                    builder: (context, transactionSuccefull, child) {
+                      if (transactionSuccefull) {
+                        return ElevatedButton(
+                          onPressed: () async {
+                            try {
+                              await StonePayments.printReceipt(
+                                  TypeOwnerPrintEnum.client);
+                            } catch (e) {
+                              message.value = "Falha no pagamento";
+                            }
+                          },
+                          child: const Text('Imprimir Via Cliente'),
+                        );
+                      }
+                      return const SizedBox();
+                    }),
                 const SizedBox(height: 20),
                 const Text('Message:'),
                 ValueListenableBuilder(

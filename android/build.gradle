@@ -4,7 +4,7 @@ version '1.0-SNAPSHOT'
 buildscript {
     ext {
         kotlin_version = '1.9.0'
-        stone_sdk_version = '4.9.2'
+        stone_sdk_version = '4.9.5'
 
         localProp = new Properties()
         fileName = 'local.properties'
@@ -28,7 +28,6 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
-
         maven { url "https://packagecloud.io/priv/${packageCloudReadToken}/stone/pos-android/maven2" }
     }
 }

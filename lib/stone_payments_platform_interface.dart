@@ -72,4 +72,9 @@ abstract class StonePaymentsPlatform extends PlatformInterface {
   Future<String?> printReceipt(TypeOwnerPrintEnum type) {
     throw UnimplementedError('printReceipt() has not been implemented.');
   }
+
+  /// Abort
+  Future<String?> abort() {
+    throw UnimplementedError('abort() has not been implemented.');
+  }
 }
