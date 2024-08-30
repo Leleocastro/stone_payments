@@ -81,20 +81,20 @@ void main() {
       int installment = 1;
       bool printReceipt = false;
 
-      Transaction? result = await StonePayments.transaction(
+      String? result = await StonePayments.payment(
         value: value,
         typeTransaction: typeTransaction,
         installment: installment,
         printReceipt: printReceipt,
       );
 
-      expect(result, isA<Transaction>());
+      expect(result, isA<String>());
     });
 
     test('payment throws assertion error when value is not greater than 0',
         () async {
       expect(
-        () async => await StonePayments.transaction(
+        () async => await StonePayments.payment(
           value: -100.0,
           typeTransaction: TypeTransactionEnum.credit,
           installment: 1,
@@ -108,7 +108,7 @@ void main() {
         'payment throws assertion error when installment is not greater than 0',
         () async {
       expect(
-        () async => await StonePayments.transaction(
+        () async => await StonePayments.payment(
           value: 100.0,
           typeTransaction: TypeTransactionEnum.credit,
           installment: 0,
@@ -122,7 +122,7 @@ void main() {
         'payment throws assertion error when installment is greater than or equal to 13',
         () async {
       expect(
-        () async => await StonePayments.transaction(
+        () async => await StonePayments.payment(
           value: 100.0,
           typeTransaction: TypeTransactionEnum.credit,
           installment: 13,
