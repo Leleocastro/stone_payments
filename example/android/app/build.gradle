@@ -24,6 +24,8 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+//Uncomment the following line to add the Positivo signing config
+// apply from: file('../positivo/positivo-signing-config.gradle')
 
 android {
     compileSdkVersion 33

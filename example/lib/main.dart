@@ -29,16 +29,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String text = 'Running';
   late StreamSubscription<String> listen;
   Uint8List? image;
+  TextEditingController valueController = TextEditingController();
+
+  ValueNotifier message = ValueNotifier<String>('Running...');
+  ValueNotifier transactionSuccefull = ValueNotifier<bool>(false);
 
   @override
   void initState() {
     listen = StonePayments.onMessageListener((message) {
-      setState(() {
-        text = message;
-      });
+      this.message.value = message;
     });
 
     super.initState();
@@ -58,38 +59,160 @@ class _MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(text),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (listen.isPaused) {
-                      listen.resume();
-                    }
-                    try {
-                      final result = await StonePayments.transaction(
-                        value: 5,
-                        typeTransaction: TypeTransactionEnum.pix,
-                        onPixQrCode: (value) {
-                          setState(() {
-                            image = base64Decode(value);
-                          });
-                        },
-                      );
-                      print(result);
-                    } catch (e) {
-                      listen.pause();
-                      setState(() {
-                        text = "Falha no pagamento";
-                      });
-                    }
-                  },
-                  child: const Text('Comprar'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: valueController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                    ],
+                    decoration: const InputDecoration(
+                      hintText: 'Valor',
+                      contentPadding: EdgeInsets.all(10.0),
+                    ),
+                  ),
+                ),
+                Wrap(
+                  children: [
+                    //CREDITO
+                    ElevatedButton(
+                      onPressed: () async {
+                        FocusScope.of(context).unfocus();
+                        if (valueController.text.isEmpty) return;
+
+                        if (listen.isPaused) {
+                          listen.resume();
+                        }
+
+                        final valor = double.parse(valueController.text);
+                        try {
+                          final result = await StonePayments.transaction(
+                            value: valor,
+                            typeTransaction: TypeTransactionEnum.credit,
+                            printReceipt: true,
+                          );
+                          if (result == null) return;
+
+                          if (result.transactionStatus == "APPROVED") {
+                            transactionSuccefull.value = true;
+                          }
+                        } catch (e) {
+                          listen.pause();
+                          message.value = "Falha no pagamento";
+                        }
+                      },
+                      child: const Text('CRÉDITO'),
+                    ),
+                    const SizedBox(width: 10),
+                    //CREDITO - 2X
+                    ElevatedButton(
+                      onPressed: () async {
+                        FocusScope.of(context).unfocus();
+                        if (valueController.text.isEmpty) return;
+
+                        if (listen.isPaused) {
+                          listen.resume();
+                        }
+
+                        final valor = double.parse(valueController.text);
+                        try {
+                          final result = await StonePayments.transaction(
+                            value: valor,
+                            typeTransaction: TypeTransactionEnum.credit,
+                            installment: 2,
+                            printReceipt: true,
+                          );
+                          if (result == null) return;
+                          if (result.transactionStatus == "APPROVED") {
+                            transactionSuccefull.value = true;
+                          }
+                          debugPrint(result.toJson());
+                        } catch (e) {
+                          listen.pause();
+                          message.value = "Falha no pagamento";
+                        }
+                      },
+                      child: const Text('CRÉDITO - 2X'),
+                    ),
+                    const SizedBox(width: 10),
+                    //DÉBITO
+                    ElevatedButton(
+                      onPressed: () async {
+                        FocusScope.of(context).unfocus();
+                        if (valueController.text.isEmpty) return;
+
+                        if (listen.isPaused) {
+                          listen.resume();
+                        }
+
+                        final valor = double.parse(valueController.text);
+                        try {
+                          final result = await StonePayments.transaction(
+                            value: valor,
+                            typeTransaction: TypeTransactionEnum.debit,
+                            printReceipt: true,
+                          );
+                          if (result == null) return;
+                          if (result.transactionStatus == "APPROVED") {
+                            transactionSuccefull.value = true;
+                          }
+                          debugPrint(result.toJson());
+                        } catch (e) {
+                          listen.pause();
+                          message.value = "Falha no pagamento";
+                        }
+                      },
+                      child: const Text('DÉBITO'),
+                    ),
+                    const SizedBox(width: 10),
+                    //PIX
+                    ElevatedButton(
+                      onPressed: () async {
+                        FocusScope.of(context).unfocus();
+                        if (valueController.text.isEmpty) return;
+
+                        if (listen.isPaused) {
+                          listen.resume();
+                        }
+
+                        final valor = double.parse(valueController.text);
+                        try {
+                          final result = await StonePayments.transaction(
+                            value: valor,
+                            typeTransaction: TypeTransactionEnum.pix,
+                            printReceipt: true,
+                            onPixQrCode: (String value) async {
+                              final qrCodeBase64 = value.replaceAll('\n', '');
+                              final bytes = base64Decode(qrCodeBase64);
+                              setState(() {
+                                image = bytes;
+                              });
+                            },
+                          );
+                          if (result == null) return;
+                          if (result.transactionStatus == "APPROVED") {
+                            transactionSuccefull.value = true;
+                          }
+                          debugPrint(result.toJson());
+                        } catch (e) {
+                          listen.pause();
+                          message.value = "Falha no pagamento";
+                        }
+                      },
+                      child: const Text('PIX'),
+                    ),
+                  ],
                 ),
                 if (image != null)
                   Image.memory(
                     image!,
-                    height: 200,
+                    height: 100,
                   ),
-                Image.asset('assets/flutter5786.png'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset(width: 100, 'assets/flutter5786.png'),
+                ),
                 ElevatedButton(
                   onPressed: () async {
                     try {
@@ -111,43 +234,45 @@ class _MyAppState extends State<MyApp> {
                           type: ItemPrintTypeEnum.image,
                           data: imgBase64,
                         ),
+                        if (image != null)
+                          ItemPrintModel(
+                            type: ItemPrintTypeEnum.image,
+                            data: base64Encode(image!.toList()),
+                          ),
                       ];
 
                       await StonePayments.print(items);
                     } catch (e) {
-                      setState(() {
-                        text = "Falha na impressão";
-                      });
+                      message.value = "Falha no pagamento";
                     }
                   },
-                  child: const Text('Imprimir'),
+                  child: const Text('Teste de Impressão'),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      await StonePayments.printReceipt(
-                          TypeOwnerPrintEnum.merchant);
-                    } catch (e) {
-                      setState(() {
-                        text = "Falha na impressão";
-                      });
-                    }
-                  },
-                  child: const Text('Imprimir Via Loja'),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      await StonePayments.printReceipt(
-                          TypeOwnerPrintEnum.client);
-                    } catch (e) {
-                      setState(() {
-                        text = "Falha na impressão";
-                      });
-                    }
-                  },
-                  child: const Text('Imprimir Via Cliente'),
-                ),
+                   ValueListenableBuilder(
+                      valueListenable: transactionSuccefull,
+                      builder: (context, transactionSuccefull, child) {
+                        if (transactionSuccefull) {
+                          return ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                await StonePayments.printReceipt(
+                                    TypeOwnerPrintEnum.client);
+                              } catch (e) {
+                                message.value = "Falha no pagamento";
+                              }
+                            },
+                            child: const Text('Imprimir Via Cliente'),
+                          );
+                        }
+                        return const SizedBox();
+                      }),
+                const SizedBox(height: 20),
+                const Text('Message:'),
+                ValueListenableBuilder(
+                    valueListenable: message,
+                    builder: (context, message, child) {
+                      return Text(message.toString());
+                    }),
               ],
             ),
           ),
