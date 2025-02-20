@@ -1,3 +1,12 @@
+## v0.1.7+4
+
+- Remove package name from manifest;
+- Added namespace into build.gradle
+
+## v0.1.7+3
+⚠️ **[DEPRECATED] Esta versão contém um bug crítico e não deve ser usada.**  
+✅ **Por favor, atualize para [1.2.4]**.
+
 ## v0.1.7+2
 
 - Increase documentation;
