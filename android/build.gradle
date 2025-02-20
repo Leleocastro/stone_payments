@@ -39,6 +39,8 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 33
 
+    namespace "dev.ltag.stone_payments"
+
     lintOptions {
         disable 'InvalidPackage'
     }
