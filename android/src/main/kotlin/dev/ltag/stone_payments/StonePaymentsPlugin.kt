@@ -129,7 +129,7 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
                     result.error("UNAVAILABLE", "Cannot Activate", e.toString())
                 }
             }
-            "abort" -> {
+            "abortPayment" -> {
                 try {
                     paymentUsecase!!.doAbort() { resp ->
                         when (resp) {
@@ -143,18 +143,51 @@ class StonePaymentsPlugin : FlutterPlugin, MethodCallHandler, Activity() {
                     result.error("UNAVAILABLE", "Cannot Activate", e.toString())
                 }
             }
-//          "cancel-payment" -> {
-//              try {
-//                  payment!!.cancel { resp ->
-//                      when (resp) {
-//                          is Result.Success<*> -> result.success(resp.data.toString())
-//                          else -> result.error("Error", resp.toString(), resp.toString())
-//                      }
-//                  }
-//              } catch (e: Exception) {
-//                  result.error("UNAVAILABLE", "Cannot cancel", e.toString())
-//              }
-//          }
+            "cancelPayment" -> {
+                try {
+                    paymentUsecase!!.doCancelWithITK(
+                       call.argument("initiatorTransactionKey")!!,
+                       call.argument("printReceipt"),
+                   ) { resp ->
+                        when (resp) {
+                            is Result.Success<*> -> result.success(resp.data.toString())
+                            else -> result.error("Error", resp.toString(), resp.toString())
+                        }
+                    }
+                } catch (e: Exception) {
+                    result.error("UNAVAILABLE", "Cannot cancel", e.toString())
+                }
+            }
+            // "cancelPaymentWithATK" -> {
+            //     try {
+            //         paymentUsecase!!.doCancelWithITK(
+            //            call.argument("acquirerTransactionKey")!!,
+            //            call.argument("printReceipt"),
+            //        ) { resp ->
+            //             when (resp) {
+            //                 is Result.Success<*> -> result.success(resp.data.toString())
+            //                 else -> result.error("Error", resp.toString(), resp.toString())
+            //             }
+            //         }
+            //     } catch (e: Exception) {
+            //         result.error("UNAVAILABLE", "Cannot cancel", e.toString())
+            //     }
+            // }
+            "cancelPaymentWithAuthorizationCode" -> {
+                try {
+                    paymentUsecase!!.doCancelWithAuthorizationCode(
+                       call.argument("authorizationCode")!!,
+                       call.argument("printReceipt"),
+                   ) { resp ->
+                        when (resp) {
+                            is Result.Success<*> -> result.success(resp.data.toString())
+                            else -> result.error("Error", resp.toString(), resp.toString())
+                        }
+                    }
+                } catch (e: Exception) {
+                    result.error("UNAVAILABLE", "Cannot cancel", e.toString())
+                }
+            }
             else -> {
                 result.notImplemented()
             }

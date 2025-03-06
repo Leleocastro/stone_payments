@@ -13,7 +13,7 @@ void main() {
   const MethodChannel channel = MethodChannel('stone_payments');
 
   setUp(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+    TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
       switch (methodCall.method) {
         case 'payment':
@@ -33,7 +33,7 @@ void main() {
   });
 
   tearDown(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+    TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (null));
   });
 
@@ -84,6 +84,14 @@ void main() {
     expect(
       await platform.printReceipt(TypeOwnerPrintEnum.merchant),
       'receipt_printed',
+    );
+  });
+
+  test('abortPayment', () async {
+    final abort = await platform.abortPayment();
+    expect(
+      abort,
+      null,
     );
   });
 }

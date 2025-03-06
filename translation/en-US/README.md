@@ -195,12 +195,15 @@ class _MyAppState extends State<MyApp> {
 
   ValueNotifier message = ValueNotifier<String>('Running...');
   ValueNotifier transactionSuccefull = ValueNotifier<bool>(false);
+  ValueNotifier transactions = ValueNotifier<List<Transaction>>([]);
 
   @override
   void initState() {
     listen = StonePayments.onMessageListener((message) {
       this.message.value = message;
     });
+
+    valueController.text = '10.00';
 
     super.initState();
   }
@@ -364,6 +367,28 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ],
                 ),
+                //ABORT TRANSACTION
+                ElevatedButton(
+                  onPressed: () async {
+                    FocusScope.of(context).unfocus();
+                    if (valueController.text.isEmpty) return;
+
+                    if (listen.isPaused) {
+                      listen.resume();
+                    }
+
+                    try {
+                      final result = await StonePayments.abortPayment();
+                      if (result == null) return;
+                      debugPrint(result.toString());
+                    } catch (e) {
+                      listen.pause();
+                      message.value = "Abort Transaction Failed";
+                    }
+                  },
+                  child: const Text('ABORT TRANSACTION'),
+                ),
+
                 if (image != null)
                   Image.memory(
                     image!,
@@ -427,12 +452,52 @@ class _MyAppState extends State<MyApp> {
                         return const SizedBox();
                       }),
                 const SizedBox(height: 20),
-                const Text('Message:'),
+                const Text('Return Message:'),
                 ValueListenableBuilder(
                     valueListenable: message,
                     builder: (context, message, child) {
                       return Text(message.toString());
                     }),
+                ValueListenableBuilder(
+                    valueListenable: transactions,
+                    builder: (context, _transactions, child) {
+                      if (_transactions.isEmpty) return const SizedBox();
+
+                      return Column(
+                        children:[
+                          const SizedBox(height: 20),
+                          const Text('Transactions:'),
+                          ..._transactions
+                              .map((transaction) => ListTile(
+                                    title: Text(transaction
+                                        .initiatorTransactionKey
+                                        .toString()),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () async {
+                                        final result =
+                                            await StonePayments.cancelPayment(
+                                                initiatorTransactionKey:
+                                                    transaction
+                                                        .initiatorTransactionKey!,
+                                                printReceipt: true);
+                                        if (result == null) return;
+                                        if (result.transactionStatus ==
+                                            "CANCELLED") {
+                                          transactionSuccefull.value = true;
+                                          transactions.value
+                                              .remove(transaction);
+                                          transactions.notifyListeners();
+                                        }
+                                        debugPrint(result.toJson());
+                                      },
+                                    ),
+                                  ))
+                              .toList()
+                        ],
+                      );
+                    }),
+              
               ],
             ),
           ),

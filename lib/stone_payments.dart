@@ -157,7 +157,73 @@ class StonePayments {
 
   /// Aborta a transação atual.
   ///
-  static Future<String?> abort() {
-    return StonePaymentsPlatform.instance.abort();
+  static Future<String?> abortPayment() {
+    return StonePaymentsPlatform.instance.abortPayment();
+  }
+
+  /// Cancela um pagamento com a chave da transação definido pela sua aplicação.
+  ///
+  /// Parâmetros:
+  ///
+  /// * `initiatorTransactionKey` (required) - Chave da transação definida pela sua aplicação.
+  /// * `printReceipt` (optional) - Opção para imprimir o comprovante (padrão é nulo).
+  ///
+  /// Retorna:
+  ///
+  /// * Uma `Future<Transaction?>` com o objeto da transação. O valor pode ser nulo em caso de erro.
+  static Future<Transaction?> cancelPayment({
+    required String initiatorTransactionKey,
+    bool? printReceipt,
+  }) {
+    assert(initiatorTransactionKey != "", 'A chave da transação deve ser válida.');
+
+    return StonePaymentsPlatform.instance.cancelPayment(
+      initiatorTransactionKey: initiatorTransactionKey,
+      printReceipt: printReceipt,
+    );
+  }
+
+  // /// Cancela um pagamento com a chave da transação do adquirente.
+  // ///
+  // /// Parâmetros:
+  // ///
+  // /// * `acquirerTransactionKey` (required) - Chave da transação do adquirente.
+  // /// * `printReceipt` (optional) - Opção para imprimir o comprovante (padrão é nulo).
+  // ///
+  // /// Retorna:
+  // ///
+  // /// * Uma `Future<Transaction?>` com o objeto da transação. O valor pode ser nulo em caso de erro.
+  // static Future<Transaction?> cancelPaymentWithATK({
+  //   required String acquirerTransactionKey,
+  //   bool? printReceipt,
+  // }) {
+  //   assert(acquirerTransactionKey != "", 'A chave de transação do adquirente deve ser válida.');
+
+  //   return StonePaymentsPlatform.instance.cancelPaymentWithATK(
+  //     acquirerTransactionKey: acquirerTransactionKey,
+  //     printReceipt: printReceipt,
+  //   );
+  // }
+
+  /// Cancela um pagamento com o authorizationCode.
+  ///
+  /// Parâmetros:
+  ///
+  /// * `authorizationCode` (required) - Código de autorização da transação.
+  /// * `printReceipt` (optional) - Opção para imprimir o comprovante (padrão é nulo).
+  ///
+  /// Retorna:
+  ///
+  /// * Uma `Future<Transaction?>` com o objeto da transação. O valor pode ser nulo em caso de erro.
+  static Future<Transaction?> cancelPaymentWithAuthorizationCode({
+    required String authorizationCode,
+    bool? printReceipt,
+  }) {
+    assert(authorizationCode != "", 'O código de autorização deve ser válido.');
+
+    return StonePaymentsPlatform.instance.cancelPaymentWithAuthorizationCode(
+      authorizationCode: authorizationCode,
+      printReceipt: printReceipt,
+    );
   }
 }

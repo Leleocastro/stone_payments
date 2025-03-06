@@ -18,7 +18,7 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
 
   final _paymentController = StreamController<String>.broadcast();
 
-  bool _paymentInProgress = false;
+  bool _transactionInProgress = false;
 
   ValueChanged<String>? _currentOnPixQrCode;
 
@@ -72,11 +72,11 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
     ValueChanged<String>? onPixQrCode,
   }) async {
     try {
-      if (_paymentInProgress) {
+      if (_transactionInProgress) {
         return null;
       }
 
-      _paymentInProgress = true;
+      _transactionInProgress = true;
 
       _currentOnPixQrCode = onPixQrCode;
 
@@ -94,11 +94,11 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
         return null;
       }
 
-      _paymentInProgress = false;
+      _transactionInProgress = false;
 
       return Transaction.fromJson(result);
     } catch (e) {
-      _paymentInProgress = false;
+      _transactionInProgress = false;
       rethrow;
     }
   }
@@ -149,9 +149,90 @@ class MethodChannelStonePayments extends StonePaymentsPlatform {
   }
 
   @override
-  Future<String?> abort() async {
-    final result = await methodChannel.invokeMethod<String>('abort');
+  Future<String?> abortPayment() async {
+    final result = await methodChannel.invokeMethod<String>('abortPayment');
 
     return result;
+  }
+
+  @override
+  Future<Transaction?> cancelPayment({
+    required String initiatorTransactionKey,
+    bool? printReceipt,
+  }) async {
+    if (_transactionInProgress) {
+      return null;
+    }
+
+    _transactionInProgress = true;
+
+    final result = await methodChannel.invokeMethod<String>(
+      'cancelPayment',
+      <String, dynamic>{
+        'initiatorTransactionKey': initiatorTransactionKey,
+        'printReceipt': printReceipt,
+      },
+    );
+    if (result == null) {
+      return null;
+    }
+
+    _transactionInProgress = false;
+
+    return Transaction.fromJson(result);
+  }
+
+  // @override
+  // Future<Transaction?> cancelPaymentWithATK({
+  //   required String acquirerTransactionKey,
+  //   bool? printReceipt,
+  // }) async {
+  //   if (_transactionInProgress) {
+  //     return null;
+  //   }
+
+  //   _transactionInProgress = true;
+
+  //   final result = await methodChannel.invokeMethod<String>(
+  //     'cancelPaymentWithATK',
+  //     <String, dynamic>{
+  //       'acquirerTransactionKey': acquirerTransactionKey,
+  //       'printReceipt': printReceipt,
+  //     },
+  //   );
+  //   if (result == null) {
+  //     return null;
+  //   }
+
+  //   _transactionInProgress = false;
+
+  //   return Transaction.fromJson(result);
+  // }
+
+  @override
+  Future<Transaction?> cancelPaymentWithAuthorizationCode({
+    required String authorizationCode,
+    bool? printReceipt,
+  }) async {
+    if (_transactionInProgress) {
+      return null;
+    }
+
+    _transactionInProgress = true;
+
+    final result = await methodChannel.invokeMethod<String>(
+      'cancelPaymentWithAuthorizationCode',
+      <String, dynamic>{
+        'authorizationCode': authorizationCode,
+        'printReceipt': printReceipt,
+      },
+    );
+    if (result == null) {
+      return null;
+    }
+
+    _transactionInProgress = false;
+
+    return Transaction.fromJson(result);
   }
 }

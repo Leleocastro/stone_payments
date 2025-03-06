@@ -21,6 +21,8 @@ import stone.application.enums.TypeOfTransactionEnum
 import stone.application.interfaces.StoneActionCallback
 import stone.application.interfaces.StoneCallbackInterface
 import stone.database.transaction.TransactionObject
+import stone.database.transaction.TransactionDAO
+import stone.providers.CancellationProvider;
 import stone.utils.Stone
 
 class PaymentUsecase(
@@ -131,7 +133,6 @@ class PaymentUsecase(
             Log.d("ERROR", e.toString())
             callback(Result.Error(e))
         }
-
     }
 
     fun doTransaction(
@@ -146,8 +147,7 @@ class PaymentUsecase(
 
             val transactionObject = stonePayments.transactionObject
 
-            transactionObject.instalmentTransaction =
-                InstalmentTransactionEnum.getAt(installment - 1)
+            transactionObject.instalmentTransaction = InstalmentTransactionEnum.getAt(installment - 1)
             transactionObject.typeOfTransaction = TypeOfTransactionEnum.values()[type]
 
             transactionObject.isCapture = true
@@ -235,24 +235,135 @@ class PaymentUsecase(
             Log.d("ERROR", e.toString())
             callback(Result.Error(e))
         }
-
     }
 
-    fun doAbort(callback: (Result<String>) -> Unit,
-    ) {
+    fun doAbort(callback: (Result<String>) -> Unit) {
         try {
             val transactionObject = stonePayments.transactionObject
 
             if(provider == null){
+                callback(Result.Error(Exception("PROVIDER NOT FOUND")))
                 return
             }
 
             provider.abortPayment()
+            sendAMessage("ABORTED")
+            callback(Result.Success("ABORTED"))
         } catch (e: Exception) {
             Log.d("ERROR", e.toString())
             callback(Result.Error(e))
         }
+    }
 
+    fun doCancelWithITK(initiatorTransactionKey: String, print: Boolean?, callback: (Result<String>) -> Unit) {
+        try {
+            val transactionDAO = TransactionDAO(context)
+            val transactionObject = transactionDAO.findTransactionWithInitiatorTransactionKey(initiatorTransactionKey)
+
+            if (transactionObject == null) {
+                callback(Result.Error(Exception("TRANSACTION NOT FOUND")))
+                return
+            }
+
+            return cancel(transactionObject, print, callback)
+
+        } catch (e: Exception) {
+            Log.d("ERROR", e.toString())
+            callback(Result.Error(e));
+        }
+    }
+
+    // fun doCancelWithATK(acquirerTransactionKey: String, print: Boolean?, callback: (Result<String>) -> Unit) {
+    //     try {
+    //         val transactionDAO = TransactionDAO(context)
+    //         val transactionObject = transactionDAO.findTransactionWithATK(acquirerTransactionKey)
+
+    //         if (transactionObject == null) {
+    //             callback(Result.Error(Exception("TRANSACTION NOT FOUND")))
+    //             return
+    //         }
+
+    //         return cancel(transactionObject, print, callback)
+
+    //     } catch (e: Exception) {
+    //         Log.d("ERROR", e.toString())
+    //         callback(Result.Error(e));
+    //     }
+    // }
+
+    fun doCancelWithAuthorizationCode(authorizationCode: String, print: Boolean?, callback: (Result<String>) -> Unit) {
+        try {
+            val transactionDAO = TransactionDAO(context)
+            val transactionObject = transactionDAO.findTransactionWithAuthorizationCode(authorizationCode)
+
+            if (transactionObject == null) {
+                callback(Result.Error(Exception("TRANSACTION NOT FOUND")))
+                return
+            }
+
+            return cancel(transactionObject, print, callback)
+
+        } catch (e: Exception) {
+            Log.d("ERROR", e.toString())
+            callback(Result.Error(e));
+        }
+    }
+
+    private fun cancel(transactionObject: TransactionObject, print: Boolean?, callback: (Result<String>) -> Unit,) {
+        if(transactionObject == null) {
+            callback(Result.Error(Exception("NOT FOUND")))
+            return
+        }
+
+        val provider = CancellationProvider(
+            context,
+            transactionObject,
+        )
+
+        provider.setConnectionCallback(object : StoneCallbackInterface {
+
+            override fun onSuccess() {
+                if(print == true) {
+                    val posPrintReceiptProvider =
+                        PosPrintReceiptProvider(
+                            context, transactionObject,
+                            ReceiptType.MERCHANT,
+                        );
+
+                    posPrintReceiptProvider.connectionCallback = object :
+                        StoneCallbackInterface {
+
+                        override fun onSuccess() {
+
+                            Log.d("SUCCESS", transactionObject.toString())
+                            
+                        }
+
+                        override fun onError() {
+                            Log.d("ERRORPRINT", transactionObject.toString())
+
+                        }
+                    }
+
+                    posPrintReceiptProvider.execute()
+                }
+
+                val serializableTransaction = SerializableTransactionObject.from(transactionObject)
+
+                val jsonString = Gson().toJson(serializableTransaction)
+                callback(Result.Success(jsonString))
+
+            }
+
+            override fun onError() {
+
+                Log.d("RESULT", "ERROR")
+
+                callback(Result.Error(Exception("ERROR")));
+            }
+        })
+
+        provider.execute()
     }
 
     private fun sendAMessage(message: String) {

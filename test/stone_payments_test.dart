@@ -60,8 +60,20 @@ class MockStonePaymentsPlatform
   }
 
   @override
-  Future<String?> abort() {
+  Future<String?> abortPayment() {
     return Future.value('Aborted');
+  }
+
+  @override
+  Future<Transaction?> cancelPayment(
+      {required String initiatorTransactionKey, bool? printReceipt}) {
+    return Future.value(Transaction());
+  }
+
+  @override
+  Future<Transaction?> cancelPaymentWithAuthorizationCode(
+      {required String authorizationCode, bool? printReceipt}) {
+    return Future.value(Transaction());
   }
 }
 
@@ -75,6 +87,7 @@ void main() {
     fakePlatform = MockStonePaymentsPlatform();
     StonePaymentsPlatform.instance = fakePlatform;
   });
+  
   test('$MethodChannelStonePayments is the default instance', () {
     expect(initialPlatform, isInstanceOf<MethodChannelStonePayments>());
   });
@@ -260,11 +273,39 @@ void main() {
           result,
           isA<
               StreamSubscription<String> Function(
-                ValueChanged<String>?, {
-                bool? cancelOnError,
-                VoidCallback? onDone,
-                Function? onError,
-              })>());
+            ValueChanged<String>?, {
+            bool? cancelOnError,
+            VoidCallback? onDone,
+            Function? onError,
+          })>());
+    });
+
+    test('abortPayment should return status of aborting payment', () async {
+      String? result = await StonePayments.abortPayment();
+
+      expect(result, isA<String>());
+    });
+
+    test('cancelPayment should return the transaction object', () async {
+      String initiatorTransaction = '12345678901234';
+
+      var result = await StonePayments.cancelPayment(
+        initiatorTransactionKey: initiatorTransaction,
+      );
+
+      expect(result, isA<Transaction>());
+    });
+
+    test(
+        'cancelPaymentWithAuthorizationCode should return the transaction object',
+        () async {
+      String authorizationCode = '12345678901234';
+
+      var result = await StonePayments.cancelPaymentWithAuthorizationCode(
+        authorizationCode: authorizationCode,
+      );
+
+      expect(result, isA<Transaction>());
     });
   });
 }
