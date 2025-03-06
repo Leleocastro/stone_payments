@@ -380,6 +380,11 @@ class _MyAppState extends State<MyApp> {
                     try {
                       final result = await StonePayments.abortPayment();
                       if (result == null) return;
+
+                      if(result == "ABORTED") {
+                        message.value = "Transação abortada com sucesso";
+                      }
+
                       debugPrint(result.toString());
                     } catch (e) {
                       listen.pause();

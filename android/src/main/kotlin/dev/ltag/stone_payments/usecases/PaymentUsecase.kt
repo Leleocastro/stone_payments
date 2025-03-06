@@ -247,7 +247,6 @@ class PaymentUsecase(
             }
 
             provider.abortPayment()
-            sendAMessage("ABORTED")
             callback(Result.Success("ABORTED"))
         } catch (e: Exception) {
             Log.d("ERROR", e.toString())
