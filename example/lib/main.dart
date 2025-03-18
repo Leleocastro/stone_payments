@@ -7,6 +7,7 @@ import 'package:stone_payments/enums/item_print_type_enum.dart';
 import 'package:stone_payments/enums/type_owner_print_enum.dart';
 import 'package:stone_payments/enums/type_transaction_enum.dart';
 import 'package:stone_payments/models/item_print_model.dart';
+import 'package:stone_payments/models/transaction.dart';
 import 'package:stone_payments/stone_payments.dart';
 
 void main() async {
@@ -35,12 +36,15 @@ class _MyAppState extends State<MyApp> {
 
   ValueNotifier message = ValueNotifier<String>('Running...');
   ValueNotifier transactionSuccefull = ValueNotifier<bool>(false);
+  ValueNotifier transactions = ValueNotifier<List<Transaction>>([]);
 
   @override
   void initState() {
     listen = StonePayments.onMessageListener((message) {
       this.message.value = message;
     });
+
+    valueController.text = '10.00';
 
     super.initState();
   }
@@ -96,6 +100,8 @@ class _MyAppState extends State<MyApp> {
 
                           if (result.transactionStatus == "APPROVED") {
                             transactionSuccefull.value = true;
+                            transactions.value.add(result);
+                            transactions.notifyListeners();
                           }
                         } catch (e) {
                           listen.pause();
@@ -126,6 +132,8 @@ class _MyAppState extends State<MyApp> {
                           if (result == null) return;
                           if (result.transactionStatus == "APPROVED") {
                             transactionSuccefull.value = true;
+                            transactions.value.add(result);
+                            transactions.notifyListeners();
                           }
                           debugPrint(result.toJson());
                         } catch (e) {
@@ -156,6 +164,8 @@ class _MyAppState extends State<MyApp> {
                           if (result == null) return;
                           if (result.transactionStatus == "APPROVED") {
                             transactionSuccefull.value = true;
+                            transactions.value.add(result);
+                            transactions.notifyListeners();
                           }
                           debugPrint(result.toJson());
                         } catch (e) {
@@ -193,6 +203,8 @@ class _MyAppState extends State<MyApp> {
                           if (result == null) return;
                           if (result.transactionStatus == "APPROVED") {
                             transactionSuccefull.value = true;
+                            transactions.value.add(result);
+                            transactions.notifyListeners();
                           }
                           debugPrint(result.toJson());
                         } catch (e) {
@@ -204,6 +216,33 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ],
                 ),
+                //ABORTAR TRANSAÇÃO
+                ElevatedButton(
+                  onPressed: () async {
+                    FocusScope.of(context).unfocus();
+                    if (valueController.text.isEmpty) return;
+
+                    if (listen.isPaused) {
+                      listen.resume();
+                    }
+
+                    try {
+                      final result = await StonePayments.abortPayment();
+                      if (result == null) return;
+
+                      if(result == "ABORTED") {
+                        message.value = "Transação abortada com sucesso";
+                      }
+
+                      debugPrint(result.toString());
+                    } catch (e) {
+                      listen.pause();
+                      message.value = "Falha ao abortar transação";
+                    }
+                  },
+                  child: const Text('ABORTAR TRANSAÇÃO'),
+                ),
+
                 if (image != null)
                   Image.memory(
                     image!,
@@ -248,30 +287,69 @@ class _MyAppState extends State<MyApp> {
                   },
                   child: const Text('Teste de Impressão'),
                 ),
-                   ValueListenableBuilder(
-                      valueListenable: transactionSuccefull,
-                      builder: (context, transactionSuccefull, child) {
-                        if (transactionSuccefull) {
-                          return ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                await StonePayments.printReceipt(
-                                    TypeOwnerPrintEnum.client);
-                              } catch (e) {
-                                message.value = "Falha no pagamento";
-                              }
-                            },
-                            child: const Text('Imprimir Via Cliente'),
-                          );
-                        }
-                        return const SizedBox();
-                      }),
+                ValueListenableBuilder(
+                    valueListenable: transactionSuccefull,
+                    builder: (context, transactionSuccefull, child) {
+                      if (transactionSuccefull) {
+                        return ElevatedButton(
+                          onPressed: () async {
+                            try {
+                              await StonePayments.printReceipt(
+                                  TypeOwnerPrintEnum.client);
+                            } catch (e) {
+                              message.value = "Falha no pagamento";
+                            }
+                          },
+                          child: const Text('Imprimir Via Cliente'),
+                        );
+                      }
+                      return const SizedBox();
+                    }),
                 const SizedBox(height: 20),
-                const Text('Message:'),
+                const Text('Mensagem retorno:'),
                 ValueListenableBuilder(
                     valueListenable: message,
                     builder: (context, message, child) {
                       return Text(message.toString());
+                    }),
+                ValueListenableBuilder(
+                    valueListenable: transactions,
+                    builder: (context, _transactions, child) {
+                      if (_transactions.isEmpty) return const SizedBox();
+
+                      return Column(
+                        children: [
+                          const SizedBox(height: 20),
+                          const Text('Transações:'),
+                          ..._transactions
+                              .map((transaction) => ListTile(
+                                    title: Text(transaction
+                                        .initiatorTransactionKey
+                                        .toString()),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () async {
+                                        final result =
+                                            await StonePayments.cancelPayment(
+                                                initiatorTransactionKey:
+                                                    transaction
+                                                        .initiatorTransactionKey!,
+                                                printReceipt: true);
+                                        if (result == null) return;
+                                        if (result.transactionStatus ==
+                                            "CANCELLED") {
+                                          transactionSuccefull.value = true;
+                                          transactions.value
+                                              .remove(transaction);
+                                          transactions.notifyListeners();
+                                        }
+                                        debugPrint(result.toJson());
+                                      },
+                                    ),
+                                  ))
+                              .toList()
+                        ],
+                      );
                     }),
               ],
             ),

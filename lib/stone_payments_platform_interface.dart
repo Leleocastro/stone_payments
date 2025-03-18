@@ -72,4 +72,33 @@ abstract class StonePaymentsPlatform extends PlatformInterface {
   Future<String?> printReceipt(TypeOwnerPrintEnum type) {
     throw UnimplementedError('printReceipt() has not been implemented.');
   }
+
+  /// Abort
+  Future<String?> abortPayment() {
+    throw UnimplementedError('abortPayment() has not been implemented.');
+  }
+
+  /// Cancel Payment with ITK (Initiator Transaction Key)
+  Future<Transaction?> cancelPayment({
+    required String initiatorTransactionKey,
+    bool? printReceipt,
+  }) {
+    throw UnimplementedError('cancelPayment() has not been implemented.');
+  }
+
+  // /// Cancel Payment with ATK (Acquirer Transaction Key)
+  // Future<Transaction?> cancelPaymentWithATK({
+  //   required String acquirerTransactionKey,
+  //   bool? printReceipt,
+  // }) {
+  //   throw UnimplementedError('cancelPaymentWithATK() has not been implemented.');
+  // }
+
+  /// Cancel Payment with Authorization Code
+  Future<Transaction?> cancelPaymentWithAuthorizationCode({
+    required String authorizationCode,
+    bool? printReceipt,
+  }) {
+    throw UnimplementedError('cancelPaymentWithAuthorizationCode() has not been implemented.');
+  }
 }

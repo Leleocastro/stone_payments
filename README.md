@@ -15,7 +15,7 @@ Para usar este pacote, adicione `stone_payments` como uma dependência em seu ar
 
 ```yaml
 dependencies:
-  stone_payments: ^0.1.7
+  stone_payments: ^1.0.0
 ```
 
 Em seguida, execute `flutter pub get` para instalar o pacote.
@@ -195,12 +195,15 @@ class _MyAppState extends State<MyApp> {
 
   ValueNotifier message = ValueNotifier<String>('Running...');
   ValueNotifier transactionSuccefull = ValueNotifier<bool>(false);
+  ValueNotifier transactions = ValueNotifier<List<Transaction>>([]);
 
   @override
   void initState() {
     listen = StonePayments.onMessageListener((message) {
       this.message.value = message;
     });
+
+    valueController.text = '10.00';
 
     super.initState();
   }
@@ -364,6 +367,32 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ],
                 ),
+                //ABORTAR TRANSAÇÃO
+                ElevatedButton(
+                  onPressed: () async {
+                    FocusScope.of(context).unfocus();
+                    if (valueController.text.isEmpty) return;
+
+                    if (listen.isPaused) {
+                      listen.resume();
+                    }
+
+                    try {
+                      final result = await StonePayments.abortPayment();
+                      if (result == null) return;
+
+                      if(result == "ABORTED") {
+                        message.value = "Transação abortada com sucesso";
+                      }
+
+                      debugPrint(result.toString());
+                    } catch (e) {
+                      listen.pause();
+                      message.value = "Falha ao abortar transação";
+                    }
+                  },
+                  child: const Text('ABORTAR TRANSAÇÃO'),
+                ),
                 if (image != null)
                   Image.memory(
                     image!,
@@ -408,31 +437,71 @@ class _MyAppState extends State<MyApp> {
                   },
                   child: const Text('Teste de Impressão'),
                 ),
-                   ValueListenableBuilder(
-                      valueListenable: transactionSuccefull,
-                      builder: (context, transactionSuccefull, child) {
-                        if (transactionSuccefull) {
-                          return ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                await StonePayments.printReceipt(
-                                    TypeOwnerPrintEnum.client);
-                              } catch (e) {
-                                message.value = "Falha no pagamento";
-                              }
-                            },
-                            child: const Text('Imprimir Via Cliente'),
-                          );
-                        }
-                        return const SizedBox();
-                      }),
+                ValueListenableBuilder(
+                  valueListenable: transactionSuccefull,
+                  builder: (context, transactionSuccefull, child) {
+                    if (transactionSuccefull) {
+                      return ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            await StonePayments.printReceipt(
+                                TypeOwnerPrintEnum.client);
+                          } catch (e) {
+                            message.value = "Falha no pagamento";
+                          }
+                        },
+                        child: const Text('Imprimir Via Cliente'),
+                      );
+                    }
+                    return const SizedBox();
+                  }),
                 const SizedBox(height: 20),
-                const Text('Message:'),
+                const Text('Mensagem retorno:'),
                 ValueListenableBuilder(
                     valueListenable: message,
                     builder: (context, message, child) {
                       return Text(message.toString());
                     }),
+                ValueListenableBuilder(
+                    valueListenable: transactions,
+                    builder: (context, _transactions, child) {
+                      if (_transactions.isEmpty) return const SizedBox();
+
+                      return Column(
+                        children: [
+                          const SizedBox(height: 20),
+                          const Text('Transações:'),
+                          ..._transactions
+                              .map((transaction) => ListTile(
+                                    title: Text(transaction
+                                        .initiatorTransactionKey
+                                        .toString()),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () async {
+                                        final result =
+                                            await StonePayments.cancelPayment(
+                                                initiatorTransactionKey:
+                                                    transaction
+                                                        .initiatorTransactionKey!,
+                                                printReceipt: true);
+                                        if (result == null) return;
+                                        if (result.transactionStatus ==
+                                            "CANCELLED") {
+                                          transactionSuccefull.value = true;
+                                          transactions.value
+                                              .remove(transaction);
+                                          transactions.notifyListeners();
+                                        }
+                                        debugPrint(result.toJson());
+                                      },
+                                    ),
+                                  ))
+                              .toList()
+                        ],
+                      );
+                    }),
+              
               ],
             ),
           ),
@@ -452,12 +521,21 @@ Você pode aprender mais sobre o SDK [aqui](https://sdkandroid.stone.com.br/).
 
 Este projeto foi desenvolvido por:
 
-<div> 
+<div style="display: flex; align-items: center;"> 
+<div style="margin-right: 10px;">
 <a href="https://github.com/leleocastro">
   <img src="https://avatars.githubusercontent.com/u/24722339?s=80&u=6a5799c2aba4bb6b256a2d2e88fbda6b2d317643&v=4" height=90 />
 </a>
 <br/>
 <a href="https://github.com/leleocastro" target="_blank">Leonardo Castro</a>
+</div>
+<div style="margin-right: 10px;">
+<a href="https://github.com/carvalhowesley">
+  <img src="https://avatars.githubusercontent.com/u/19750283?v=4" height=90 />
+</a>
+<br/>
+<a href="https://github.com/carvalhowesley" target="_blank">Wesley Carvalho</a>
+</div>
 </div>
 
 &#xa0;

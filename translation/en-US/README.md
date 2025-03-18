@@ -15,7 +15,7 @@ To use this package, add `stone_payments` as a dependency in your `pubspec.yaml`
 
 ```yaml
 dependencies:
-  stone_payments: ^0.1.7
+  stone_payments: ^1.0.0
 ```
 
 Then, run `flutter pub get` to install the package.
@@ -195,12 +195,15 @@ class _MyAppState extends State<MyApp> {
 
   ValueNotifier message = ValueNotifier<String>('Running...');
   ValueNotifier transactionSuccefull = ValueNotifier<bool>(false);
+  ValueNotifier transactions = ValueNotifier<List<Transaction>>([]);
 
   @override
   void initState() {
     listen = StonePayments.onMessageListener((message) {
       this.message.value = message;
     });
+
+    valueController.text = '10.00';
 
     super.initState();
   }
@@ -364,6 +367,33 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ],
                 ),
+                //ABORT TRANSACTION
+                ElevatedButton(
+                  onPressed: () async {
+                    FocusScope.of(context).unfocus();
+                    if (valueController.text.isEmpty) return;
+
+                    if (listen.isPaused) {
+                      listen.resume();
+                    }
+
+                    try {
+                      final result = await StonePayments.abortPayment();
+                      if (result == null) return;
+                      
+                      if(result == "ABORTED") {
+                        message.value = "Transaction Aborted";
+                      }
+
+                      debugPrint(result.toString());
+                    } catch (e) {
+                      listen.pause();
+                      message.value = "Abort Transaction Failed";
+                    }
+                  },
+                  child: const Text('ABORT TRANSACTION'),
+                ),
+
                 if (image != null)
                   Image.memory(
                     image!,
@@ -427,12 +457,52 @@ class _MyAppState extends State<MyApp> {
                         return const SizedBox();
                       }),
                 const SizedBox(height: 20),
-                const Text('Message:'),
+                const Text('Return Message:'),
                 ValueListenableBuilder(
                     valueListenable: message,
                     builder: (context, message, child) {
                       return Text(message.toString());
                     }),
+                ValueListenableBuilder(
+                    valueListenable: transactions,
+                    builder: (context, _transactions, child) {
+                      if (_transactions.isEmpty) return const SizedBox();
+
+                      return Column(
+                        children:[
+                          const SizedBox(height: 20),
+                          const Text('Transactions:'),
+                          ..._transactions
+                              .map((transaction) => ListTile(
+                                    title: Text(transaction
+                                        .initiatorTransactionKey
+                                        .toString()),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () async {
+                                        final result =
+                                            await StonePayments.cancelPayment(
+                                                initiatorTransactionKey:
+                                                    transaction
+                                                        .initiatorTransactionKey!,
+                                                printReceipt: true);
+                                        if (result == null) return;
+                                        if (result.transactionStatus ==
+                                            "CANCELLED") {
+                                          transactionSuccefull.value = true;
+                                          transactions.value
+                                              .remove(transaction);
+                                          transactions.notifyListeners();
+                                        }
+                                        debugPrint(result.toJson());
+                                      },
+                                    ),
+                                  ))
+                              .toList()
+                        ],
+                      );
+                    }),
+              
               ],
             ),
           ),
@@ -452,12 +522,21 @@ You can learn more about the SDK [here](https://sdkandroid.stone.com.br/).
 
 This project was developed by:
 
-<div> 
+<div style="display: flex; align-items: center;"> 
+<div style="margin-right: 10px;">
 <a href="https://github.com/leleocastro">
   <img src="https://avatars.githubusercontent.com/u/24722339?s=80&u=6a5799c2aba4bb6b256a2d2e88fbda6b2d317643&v=4" height=90 />
 </a>
 <br/>
 <a href="https://github.com/leleocastro" target="_blank">Leonardo Castro</a>
+</div>
+<div style="margin-right: 10px;">
+<a href="https://github.com/carvalhowesley">
+  <img src="https://avatars.githubusercontent.com/u/19750283?v=4" height=90 />
+</a>
+<br/>
+<a href="https://github.com/carvalhowesley" target="_blank">Wesley Carvalho</a>
+</div>
 </div>
 
 &#xa0;

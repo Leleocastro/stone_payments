@@ -1,3 +1,10 @@
+## v1.0.0
+
+- New method `cancelPayment`;
+- New method `cancelPaymentWithAuthorizationCode` ;
+- New method `abortPayment`;
+- Updated Stone SDK version (4.10.2);
+
 ## v0.1.7+4
 
 - Remove package name from manifest;
