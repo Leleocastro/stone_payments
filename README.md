@@ -15,7 +15,7 @@ Para usar este pacote, adicione `stone_payments` como uma dependência em seu ar
 
 ```yaml
 dependencies:
-  stone_payments: ^0.1.7
+  stone_payments: ^1.0.0
 ```
 
 Em seguida, execute `flutter pub get` para instalar o pacote.
@@ -521,12 +521,21 @@ Você pode aprender mais sobre o SDK [aqui](https://sdkandroid.stone.com.br/).
 
 Este projeto foi desenvolvido por:
 
-<div> 
+<div style="display: flex; align-items: center;"> 
+<div style="margin-right: 10px;">
 <a href="https://github.com/leleocastro">
   <img src="https://avatars.githubusercontent.com/u/24722339?s=80&u=6a5799c2aba4bb6b256a2d2e88fbda6b2d317643&v=4" height=90 />
 </a>
 <br/>
 <a href="https://github.com/leleocastro" target="_blank">Leonardo Castro</a>
+</div>
+<div style="margin-right: 10px;">
+<a href="https://github.com/carvalhowesley">
+  <img src="https://avatars.githubusercontent.com/u/19750283?v=4" height=90 />
+</a>
+<br/>
+<a href="https://github.com/carvalhowesley" target="_blank">Wesley Carvalho</a>
+</div>
 </div>
 
 &#xa0;
